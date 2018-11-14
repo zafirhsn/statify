@@ -1,8 +1,17 @@
+/* Scss Document */
+/*Main stylings for all pages*/
+/*Color variables*/
+/*Font stack*/
+/*Footer styling*/
 @media screen and (min-width: 540px) {
   .bottom-row {
     margin-left: -70px;
   }
 }
+.footer-position {
+  position: fixed;
+}
+
 footer {
   position: relative;
   bottom: 0;

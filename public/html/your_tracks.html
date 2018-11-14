@@ -21,13 +21,13 @@
     <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
     
 	<!--Base style sheet-->
-	<link href="../main.css" rel="stylesheet" type="text/css">
+	<link href="../css/main.css" rel="stylesheet" type="text/css">
 
 	<!--Page style sheet-->
-	<link href="../your_tracks.css" rel="stylesheet" type="text/css">
+	<link href="../css/your_tracks.css" rel="stylesheet" type="text/css">
 	
 	<!--Favicon-->
-	<link rel="icon" type="image/png" href="bar-chart.png">
+	<link rel="icon" type="image/png" href="../imgs/bar-chart.png">
    
    
     <style type="text/css">
@@ -79,35 +79,42 @@
   	
   	<div class="container">
   		<div class="row">
-  			<div class="col mt-5">
-  				<br>
-  				<h1>Top Tracks of All Time</h1>
+				<div class="col mt-5 text-center">
+						<h1>Top Tracks of All Time</h1>
+				</div>
+				<div class="w-100"></div>
+
+  			<!-- <div class="col mt-5"> -->	
 					<div id="top-tracks-long" class="col">
 						<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
 						<span class="sr-only">Loading...</span>
 					</div>
-  			</div>
-  		</div>
-  		<div class="row" align="center">
-  			<div class="col mt-5">
-				<br>
-				<h1>Top Tracks From the Last 6 Months</h1>
-					<ol id="top-tracks-med">
-						<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
-						<span class="sr-only">Loading...</span>
-					</ol>
+				<!-- </div> -->
+				
 			</div>
-  		</div>
-  		<div class="row" align="center">
-  			<div class="col mt-5">
-  				<br>
-  				<h1>Top Tracks From the Last Month</h1>
-  					<ol id="top-tracks-short">
-						<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
-						<span class="sr-only">Loading...</span>
-					</ol>	
-  			</div>
-  		</div>
+			
+  		<div class="row">
+  			<div class="col mt-5 text-center">
+					<h1>Top Tracks From the Last 6 Months</h1>
+				</div>
+				<div class="w-100"></div>
+				<div id="top-tracks-med" class="col">
+					<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+					<span class="sr-only">Loading...</span>
+				</div>
+			</div>
+			
+  		<div class="row">
+  			<div class="col mt-5 text-center">
+					<h1>Top Tracks From the Last Month</h1>
+				</div>
+				<div class="w-100"></div>
+  			<div id="top-tracks-short" class="col">
+					<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+					<span class="sr-only">Loading...</span>
+				</div>	
+			</div>
+			
   		<div class="row mt-5">
   			<div class="col">
   				<br>
@@ -219,26 +226,54 @@
   		</div>
   		
 
-  	<script id="top-tracks-template" type="text/x-handlebars">
-		<img src={{items.[0].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">1. {{items.0.name}} by {{items.0.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[1].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">2. {{items.1.name}} by {{items.1.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[2].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">3. {{items.2.name}} by {{items.2.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[3].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">4. {{items.3.name}} by {{items.3.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[4].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">5. {{items.4.name}} by {{items.4.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[5].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">6. {{items.5.name}} by {{items.5.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[6].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">7. {{items.6.name}} by {{items.6.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[7].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">8. {{items.7.name}} by {{items.7.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[8].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">9. {{items.8.name}} by {{items.8.artists.0.name}}</p>
-		<div class="col"> </div>
-		<img src={{items.[9].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">10. {{items.9.name}} by {{items.9.artists.0.name}}</p>   
+		<script id="top-tracks-template" type="text/x-handlebars">
+		
+		<div class ="row">
+			<div class="col">
+				<img src={{items.[0].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">1. {{items.0.name}} by {{items.0.artists.0.name}}</p>
+			</div>
+			<div class="col">
+				<img src={{items.[1].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">2. {{items.1.name}} by {{items.1.artists.0.name}}</p>
+			</div>
+		</div>
+
+	
+		<div class="row">
+			<div class ="col">
+				<img src={{items.[2].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">3. {{items.2.name}} by {{items.2.artists.0.name}}</p>
+			</div>
+			<div class="col">
+				<img src={{items.[3].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">4. {{items.3.name}} by {{items.3.artists.0.name}}</p>
+			</div>
+		</div>
+	
+		<div class="row"> 
+			<div class="col">
+				<img src={{items.[4].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">5. {{items.4.name}} by {{items.4.artists.0.name}}</p>
+			</div>
+			<div class="col">
+				<img src={{items.[5].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">6. {{items.5.name}} by {{items.5.artists.0.name}}</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col">
+				<img src={{items.[6].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">7. {{items.6.name}} by {{items.6.artists.0.name}}</p>
+			</div>
+			<div class="col">
+				<img src={{items.[7].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">8. {{items.7.name}} by {{items.7.artists.0.name}}</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col">
+				<img src={{items.[8].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">9. {{items.8.name}} by {{items.8.artists.0.name}}</p>
+			</div>
+			<div class="col">
+				<img src={{items.[9].album.images.[1].url}} class="rounded-circle mt-4" height="80px"><p style="display: inline" class="ml-4">10. {{items.9.name}} by {{items.9.artists.0.name}}</p>   
+			</div>
+		</div>
+
     </script>
     
     <script id="pop-template" type="text/x-handlebars">
@@ -395,7 +430,7 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="../data.js"></script>
+    <script src="../js/data.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 
 	
