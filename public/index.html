@@ -20,14 +20,14 @@
 		<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
 		
 		<!--Base style sheet-->
-		<link href="../css/main.css" rel="stylesheet" type="text/css">
+		<link href="css/main.css" rel="stylesheet" type="text/css">
 		
 		<!--Page style sheet-->
-		<link href="../css/index.css" rel="stylesheet" type="text/css">
+		<link href="css/index.css" rel="stylesheet" type="text/css">
 		
 		
 		<!--Favicon-->
-		<link rel="icon" type="image/png" href="../imgs/bar-chart.png">
+		<link rel="icon" type="image/png" href="imgs/bar-chart.png">
 
 
 
@@ -222,11 +222,11 @@
 			console.log("True, sessionStorage is undefined");	
 
 
-      var redirecturi = 'http://www.zafirhasan.com/Statify';
-			var testuri = 'http://localhost:5500/public/html'    
+      var redirecturi = 'http://www.zafirhasan.com/statify';
+			var testuri = 'http://localhost:5500/public'    
 			document.getElementById('login-button').addEventListener('click', function() {
             var client_id = 'd4557495633b429a85292698a89e5978'; // Your client id
-            var redirect_uri = testuri; // Your redirect uri
+            var redirect_uri = redirecturi; // Your redirect uri
             var state = generateRandomString(16);
             localStorage.setItem(stateKey, state);	//set the stateKey as the random string state
             var scope = 'user-read-private user-read-email user-read-birthdate user-top-read user-library-read user-read-recently-played';
@@ -273,7 +273,12 @@
 						 $('#loggedin').show();
 						 $('#login').hide();
 						 console.log("AFTER template done");
-					   }
+						 $('footer').toggleClass("footer-position", () => {
+					 		console.log("Setting footer position");
+					 		return true;
+				 		});
+						 }
+						 
 				   });
 					
 				  //  document.getElementById('random-button').addEventListener('click', function() {
