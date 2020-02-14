@@ -8,8 +8,7 @@
 		<meta name="Keywords" content="Zafir Hasan,Zafir,Developer,Designer,Front-End Developer,UI,NYU,New York,Spotify,Statify,music,spotify,statify">
 		<meta name="author" content="=Zafir Hasan">
 		<meta name="description" content="View all your Spotify listening statistics in one site">
-		<!-- Allows googles web crawler (Googlebot) to find and index my site, this is the default value, but I want to be able to see it-->
-		<meta name="robots" content="index">
+	
 		<!-- Bootstrap CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 
@@ -21,25 +20,16 @@
 		
 		<!--Base style sheet-->
 		<link href="css/main.css" rel="stylesheet" type="text/css">
-		
+
 		<!--Page style sheet-->
 		<link href="css/index.css" rel="stylesheet" type="text/css">
-		
-		
 		<!--Favicon-->
+
 		<link rel="icon" type="image/png" href="imgs/bar-chart.png">
-
-
-
     <style type="text/css">
-	
-		
-		
-
     </style>
     
   </head>
-  
   
   <body>
 	<!--Standard bootsstrap nav-->
@@ -47,7 +37,7 @@
       
       <!-- Hamburger button -->
       <a href="#" class="navbar-toggler" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-		  <i class="fas fa-bars fa-fw fa-2x"></i></a>
+			<i class="fas fa-bars fa-fw fa-2x"></i></a>
       
 		<!--Logo/Brand link on right side of screen-->
       <a class="navbar-brand" href="index.html"><i class="fas fa-chart-bar" aria-hidden="true"></i> Statify</a>
@@ -161,11 +151,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
      
     <script>
-//		(function() {
       $(document).ready(function() {
         console.log("In beginning of function");
 
-		$("html").css("height", "auto");
+			$("html").css("height", "auto");
 		  
         var stateKey = 'spotify_auth_state';
 
@@ -226,7 +215,7 @@
 			var testuri = 'http://localhost:5500/public'    
 			document.getElementById('login-button').addEventListener('click', function() {
             var client_id = 'd4557495633b429a85292698a89e5978'; // Your client id
-            var redirect_uri = redirecturi; // Your redirect uri
+            var redirect_uri = testuri // Your redirect uri
             var state = generateRandomString(16);
             localStorage.setItem(stateKey, state);	//set the stateKey as the random string state
             var scope = 'user-read-private user-read-email user-read-birthdate user-top-read user-library-read user-read-recently-played';
@@ -279,31 +268,7 @@
 				 		});
 						 }
 						 
-				   });
-					
-				  //  document.getElementById('random-button').addEventListener('click', function() {
-						// $.ajax({
-						//    url: 'https://api.spotify.com/v1/browse/new-releases',
-						//    headers: {
-						// 	   'Authorization': 'Bearer ' + access_token
-						//    },
-						//    success: returnResponse	   
-					 //   });
-						
-					 //   	  var randomTrack = ""
-						//   function returnResponse(response) {
-						// 	 console.log("PRINTING response from Profile");
-						// 	 console.log(response);
-						// 	 console.log(response.country);
-						// 	 $("#loggedin").html(compiledWelcomeTemplate(response));
-						// 	 $("#pic").attr("src", response.images[0].url);
-						// 	 $('#loggedin').show();
-						// 	 $('#login').hide();
-						// 	 console.log("AFTER template done")
-						// 	}				   
-					   
-				  //  }, false);			
-					
+				   });							
 			  	}
 				else {
 					$('#login').show();
