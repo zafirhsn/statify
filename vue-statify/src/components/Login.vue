@@ -59,37 +59,44 @@ import querystring from 'querystring';
     },
     methods: {
       authorizeUser() {
+        let state = this.generateRandomString();
         let url  = "https://accounts.spotify.com/authorize?" + 
         querystring.stringify({
           client_id: "d4557495633b429a85292698a89e5978",
           response_type: "token",
           redirect_uri: "http://localhost:8080/dashboard",
+          state: state,
           scope: "user-read-private user-read-email user-read-birthdate user-top-read user-library-read user-read-recently-played"
         });
+        localStorage.setItem("state", state);
         window.location = url;
-  
-
       },
-      /* eslint-disable */
-      getHashParams() {
-        let hashParams = {};
-        let e, r = /([^&;=]+)=?([^&;]*)/g,
-            q = window.location.hash.substring(1);
-        while ( e = r.exec(q)) {
-          hashParams[e[1]] = decodeURIComponent(e[2]);
+      generateRandomString() {
+        let letters = "abcdefghijklmnopqrstuvwxyz";
+        let length = 16;
+        let state = "";
+        for (let i = 0; i < length; i++) {
+          state += letters[Math.floor(Math.random() * letters.length)];
         }
-        return hashParams;
+        return state;
       }
-    }
-    /* eslint-enable */
-    ,
+    },
     beforeCreate() {
-      if (localStorage["token"]) {
-        console.log(this.$router.push("/dashboard"));
+      console.log(JSON.parse(localStorage.getItem("token")));
+      if (localStorage.getItem("token")) {
+        let expiration = Number(JSON.parse(localStorage.getItem("token")).expires_in);
+        let now = Math.floor((new Date().getTime()) / 1000);
+        if (now - JSON.parse(localStorage.getItem("token")).time <= expiration) {
+          console.log(now - JSON.parse(localStorage.getItem("token")).time)
+          this.$router.push("/dashboard");
+        }
       }
+    },
+    created() {
+      // console.log(this.generateRandomString());
     }
-
   }
+  
 
 </script>
 

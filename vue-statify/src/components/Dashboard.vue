@@ -27,6 +27,9 @@ export default {
   methods: {
     share() {
       this.clicked = true;
+      this.$http.post("http://localhost:3000/").then((res)=>{
+        console.log(res);
+      })
     },
     /* eslint-disable */
     getHashParams() {
@@ -41,8 +44,15 @@ export default {
   }
   /* eslint-enable */,
   created() {
-    console.log(this.getHashParams());
-    localStorage["token"] = this.getHashParams();
+    let hashObj = this.getHashParams();
+    let numargs = 4;
+    if (Object.keys(hashObj).length === numargs && hashObj.hasOwnProperty("access_token") && hashObj.hasOwnProperty("token_type") && hashObj.hasOwnProperty("expires_in") && hashObj.hasOwnProperty("state") && hashObj["state"] === localStorage.getItem("state")) {
+      hashObj["time"] = Math.floor(((new Date()).getTime()) / 1000);
+      localStorage.setItem("token", JSON.stringify(hashObj));
+      console.log(hashObj);
+    }
+    let h = JSON.parse(localStorage.getItem("token"));
+    console.log(h);
   }
 }
 </script>
