@@ -1,28 +1,30 @@
-import Vue from 'vue'
-import App from './App.vue'
+import Vue from 'vue';
+import App from './App.vue';
 import VueResource from 'vue-resource'
-import Login from './components/Login.vue';
+// import Login from './components/Login.vue';
+// import Dashboard from './components/Dashboard.vue';
+import VueRouter from 'vue-router';
+import {routes} from './routes.js'
 
 
 // Vue.prototype.$window
 Vue.config.productionTip = false
 
 Vue.use(VueResource);
+Vue.use(VueRouter);
 
-Vue.component("login", Login);
-
-Vue.http.interceptors.push((request, next)=> {
-  next(response => {
-    response.headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, GET, PUT, OPTIONS, DELETE',
-      'Access-Control-Allow-Headers': 'Access-Control-Allow-Methods, Access-Control-Allow-Origin, Origin, Accept, Content-Type',
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
-  })
+const router = new VueRouter({
+  routes,
+  mode: 'history'
 })
+
+
+
+// Vue.component("login", Login);
+// Vue.component("dashboard", Dashboard);
+
 
 new Vue({
   render: h => h(App),
+  router
 }).$mount('#app')

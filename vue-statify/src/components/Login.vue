@@ -63,7 +63,7 @@ import querystring from 'querystring';
         querystring.stringify({
           client_id: "d4557495633b429a85292698a89e5978",
           response_type: "token",
-          redirect_uri: "http://localhost:8080",
+          redirect_uri: "http://localhost:8080/dashboard",
           scope: "user-read-private user-read-email user-read-birthdate user-top-read user-library-read user-read-recently-played"
         });
         window.location = url;
@@ -83,8 +83,10 @@ import querystring from 'querystring';
     }
     /* eslint-enable */
     ,
-    created() {
-      console.log(this.getHashParams());
+    beforeCreate() {
+      if (localStorage["token"]) {
+        console.log(this.$router.push("/dashboard"));
+      }
     }
 
   }
