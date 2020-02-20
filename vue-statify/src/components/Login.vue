@@ -82,18 +82,28 @@ import querystring from 'querystring';
       }
     },
     beforeCreate() {
-      console.log(JSON.parse(localStorage.getItem("token")));
+      console.log("===LOGIN===");
+      // If a token exists in localStorage, check to see that it's less than a day old
       if (localStorage.getItem("token")) {
-        let expiration = Number(JSON.parse(localStorage.getItem("token")).expires_in);
+        console.log("localStorage['token'] exists:", JSON.parse(localStorage.getItem("token")));
+        let expiration = Number(JSON.parse(localStorage.getItem("token")).expires_in) * 24;
         let now = Math.floor((new Date().getTime()) / 1000);
-        if (now - JSON.parse(localStorage.getItem("token")).time <= expiration) {
-          console.log(now - JSON.parse(localStorage.getItem("token")).time)
+        console.log(`The token is ${now - JSON.parse(localStorage.getItem("token")).time} seconds old`)
+        // If it is less than a day old, push dashboard
+        if (now - JSON.parse(localStorage.getItem("token")).time < expiration) {
+          console.log("The token is less than one day old, push dashboard")
           this.$router.push("/dashboard");
+        } else {
+        // Otherwise, token is too old, delete storage
+          console.log("token is more than a day old, delete");
+          localStorage.removeItem("token");
         }
+      } else {
+        console.log("Localstorage is empty");
       }
     },
     created() {
-      // console.log(this.generateRandomString());
+
     }
   }
   
