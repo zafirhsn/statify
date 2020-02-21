@@ -79,18 +79,24 @@ import querystring from 'querystring';
           state += letters[Math.floor(Math.random() * letters.length)];
         }
         return state;
+      },
+      tokenLessThanOneDay(tokenObj) {
+        let day = 24;
+        let expiration = Number(tokenObj.expires_in) * day;
+        let now = Math.floor(new Date().getTime() / 1000);
+        let time = tokenObj.time;
+        return (now - time < expiration)
       }
     },
     beforeCreate() {
       console.log("===LOGIN===");
       // If a token exists in localStorage, check to see that it's less than a day old
       if (localStorage.getItem("token")) {
-        console.log("localStorage['token'] exists:", JSON.parse(localStorage.getItem("token")));
-        let expiration = Number(JSON.parse(localStorage.getItem("token")).expires_in) * 24;
-        let now = Math.floor((new Date().getTime()) / 1000);
-        console.log(`The token is ${now - JSON.parse(localStorage.getItem("token")).time} seconds old`)
+        let tokenObj = JSON.parse(localStorage.getItem("token"));
+        console.log("localStorage['token'] exists:", tokenObj);
+
         // If it is less than a day old, push dashboard
-        if (now - JSON.parse(localStorage.getItem("token")).time < expiration) {
+        if (this.tokenLessThanOneDay(tokenObj)) {
           console.log("The token is less than one day old, push dashboard")
           this.$router.push("/dashboard");
         } else {

@@ -7,7 +7,7 @@
 			</div>
 		</div>
     <div> 
-      This is data. Enjoy it. Savor it. {{localStorageExpired()}}
+      This is data. Enjoy it. Savor it. 
     </div>
   </div>
 </template>
@@ -25,8 +25,6 @@
     beforeCreate() {
       if (!localStorage.getItem("token")) {
         console.log()
-      } else {
-        this.$router.push("/dashboard", )
       }
     },
     created() {

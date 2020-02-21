@@ -87,6 +87,55 @@ export default {
       Promise.all([this.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50", options), this.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50", options), this.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50", options)]).then(responses=> {
         console.log(responses);
       })
+    },
+    getCurrentUserProfile(access_token) {
+      this.$http.get("https://api.spotify.com/v1/me", {
+        headers: {
+          'Authorization': `Bearer ${access_token}`
+        }
+      }).then((res)=> {
+        console.log("Get Current User's Profile Success: ", res);
+        let display_name = res.body.display_name;
+        let email = res.body.email;
+        let id = res.body.id;
+        let images = res.body.images;
+        let filteredData = {
+          display_name,
+          email, 
+          id, 
+          images,
+          share: false
+        };
+        // Store this user's profile in the database
+        this.$http.post("http://localhost:3000/storeuser", filteredData).then((response)=> {
+          console.log("User's profile stored successfully in db")
+          console.log(response);
+        }).catch(err=> {
+          console.log(err.status);
+        })
+    }).catch(err=> {
+      // If the token sent with the request to user's profile is expired, remove all localStorage and sessionStorage associated with the token and request new token
+      if (err && err.status === 401) {
+        this.token_expired = true;
+        localStorage.removeItem("state");
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("profile");
+      }
+    })
+        return filteredData;
+      }).catch(err =>{
+        if (err.status === 401) {
+          this.token_expired = true;
+          localStorage.removeItem("state");
+          localStorage.removeItem("token");
+          sessionStorage.removeItem("profile");
+        } 
+        return {};
+      })
+    },
+    tokenexpired(hashObj) {
+      let ntime = Math.floor(new Date().getTime() / 1000);
+      return (ntime - hashObj.time > Number(hashObj.expires_in))
     }
   }
   /* eslint-enable */,
@@ -105,7 +154,12 @@ export default {
         console.log("Localstorage empty")
         // Add a timestamp to the token object so we can check its validatity at a later time
         hashObj["time"] = Math.floor(((new Date()).getTime()) / 1000);
+        let access_token = JSON.stringify(hashObj.access_token);
+        access_token = access_token.slice(1, access_token.length - 1);
+        let profile = this.getCurrentUserProfile(access_token);
+        hashObj["profile"] = profile;
         localStorage.setItem("token", JSON.stringify(hashObj));
+
       }
       // Otherwise, if the key exists, that means it was validated by our login component. The reason there are params in the url is because the user refreshed the page. Therefore, we don't have to add a new timestamp
       else {
@@ -124,13 +178,19 @@ export default {
     access_token = access_token.slice(1, access_token.length - 1);
     console.log("access token: ", access_token);
 
+    let profileurl;
+    if (this.tokenexpired(JSON.parse(localStorage.getItem("token")))) {
+      profileurl = `http://localhost:3000/me/`;
+    }
 
     // Request current user's profile
-    this.$http.get("https://api.spotify.com/v1/me", {
-    headers: {
-      'Authorization': `Bearer ${access_token}`
-    }
-    }).then((res)=> {
+    if (!this.tokenexpired(JSON.parse(localStorage.getItem("token")))) {
+      console.log("Token hasn't expired, make request for user's profile");
+      this.$http.get("https://api.spotify.com/v1/me", {
+        headers: {
+          'Authorization': `Bearer ${access_token}`
+        }
+      }).then((res)=> {
       console.log("Get Current User's Profile Success: ", res);
       let display_name = res.body.display_name;
       let email = res.body.email;
@@ -165,8 +225,6 @@ export default {
       }).catch(err=> {
         console.log(err.status);
       })
-
-
     }).catch(err=> {
       // If the token sent with the request to user's profile is expired, remove all localStorage and sessionStorage associated with the token and request new token
       if (err && err.status === 401) {
@@ -177,6 +235,8 @@ export default {
       }
     })
 
+    }
+    
     // Query database for user data, if it doesn't exist, request data from spotify api
 
   }
