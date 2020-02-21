@@ -110,27 +110,19 @@ export default {
         this.$http.post("http://localhost:3000/storeuser", filteredData).then((response)=> {
           console.log("User's profile stored successfully in db")
           console.log(response);
+          return filteredData.id;
         }).catch(err=> {
           console.log(err.status);
+          return {};
         })
     }).catch(err=> {
-      // If the token sent with the request to user's profile is expired, remove all localStorage and sessionStorage associated with the token and request new token
-      if (err && err.status === 401) {
-        this.token_expired = true;
-        localStorage.removeItem("state");
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("profile");
-      }
-    })
-        return filteredData;
-      }).catch(err =>{
-        if (err.status === 401) {
+        // If the token sent with the request to user's profile is expired, remove all localStorage and sessionStorage associated with the token and request new token
+        if (err && err.status === 401) {
           this.token_expired = true;
           localStorage.removeItem("state");
           localStorage.removeItem("token");
-          sessionStorage.removeItem("profile");
-        } 
-        return {};
+        }
+        return {}
       })
     },
     tokenexpired(hashObj) {
@@ -157,6 +149,7 @@ export default {
         let access_token = JSON.stringify(hashObj.access_token);
         access_token = access_token.slice(1, access_token.length - 1);
         let profile = this.getCurrentUserProfile(access_token);
+        console.log("Profile", profile);
         hashObj["profile"] = profile;
         localStorage.setItem("token", JSON.stringify(hashObj));
 
@@ -178,13 +171,12 @@ export default {
     access_token = access_token.slice(1, access_token.length - 1);
     console.log("access token: ", access_token);
 
-    let profileurl;
-    if (this.tokenexpired(JSON.parse(localStorage.getItem("token")))) {
-      profileurl = `http://localhost:3000/me/`;
-    }
+    // let profileurl;
+    // if (this.tokenexpired(JSON.parse(localStorage.getItem("token")))) {
+    //   profileurl = `http://localhost:3000/me/`;
+    // }
 
     // Request current user's profile
-    if (!this.tokenexpired(JSON.parse(localStorage.getItem("token")))) {
       console.log("Token hasn't expired, make request for user's profile");
       this.$http.get("https://api.spotify.com/v1/me", {
         headers: {
@@ -239,7 +231,6 @@ export default {
     
     // Query database for user data, if it doesn't exist, request data from spotify api
 
-  }
 }
 </script>
 
