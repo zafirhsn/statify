@@ -11,7 +11,7 @@
 			</div>
 		</div>
     <button type="button" @click="share()">Share</button>
-    <input type="text" value="laksjdlaskjd" v-if="clicked">
+    <input ref="shareInput" type="text" :value="shareable_link" v-show="clicked">
 
     <button type="button" @click="authorizeUser()" v-if="token_expired">Refresh Data</button>
   </div>
@@ -25,14 +25,20 @@ export default {
     return {
       display_name: "Zafir",
       clicked: false,
-      token_expired: false
+      token_expired: false,
+      user_id: "",
+      shareable_link: "",
     }
   },
   methods: {
     share() {
       this.clicked = true;
-      this.$http.post("http://localhost:3000/").then((res)=>{
-        console.log(res);
+      console.log(this.$refs);
+      this.$refs.shareInput.focus();
+      this.$refs.shareInput.select();
+      // document.execCommand("copy");
+      navigator.clipboard.writeText(this.shareable_link).then(()=> {
+        console.log("copying succesfull");
       })
     },
     /* eslint-disable */
@@ -66,6 +72,21 @@ export default {
       });
       localStorage.setItem("state", state);
       window.location = url;
+    },
+    getUserData() {
+      // Requesting all top artists on spotify
+      console.log("Requesting all top artists on spotify");
+      let access_token = JSON.stringify(JSON.parse(localStorage.getItem("token")).access_token);
+      access_token = access_token.slice(1, access_token.length-1);
+      let options = {
+        headers: {
+          "Authorization": `Bearer ${access_token}`
+        }
+      };
+      console.log(access_token);
+      Promise.all([this.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50", options), this.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50", options), this.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50", options)]).then(responses=> {
+        console.log(responses);
+      })
     }
   }
   /* eslint-enable */,
@@ -92,21 +113,24 @@ export default {
       }
     }
 
-    console.log("localStorage: ", JSON.parse(localStorage.getItem("token")));
+    // If, somehow, there is no valid params in url and localStorage is empty, we must prompt the user to authorize access to their information
+    else if (!localStorage.getItem("token")) {
+      this.authorizeUser();
+    }
 
+
+    console.log("localStorage: ", JSON.parse(localStorage.getItem("token")));
     let access_token = JSON.stringify(JSON.parse(localStorage.getItem("token")).access_token);
     access_token = access_token.slice(1, access_token.length - 1);
     console.log("access token: ", access_token);
 
-    if (!sessionStorage.getItem("profile")) {
-      this.$http.get("https://api.spotify.com/v1/me", {
-      headers: {
-        'Authorization': `Bearer ${access_token}`
-      }
+
+    // Request current user's profile
+    this.$http.get("https://api.spotify.com/v1/me", {
+    headers: {
+      'Authorization': `Bearer ${access_token}`
+    }
     }).then((res)=> {
-      if (res.status === 401) {
-        this.token_expired = true;
-      }
       console.log("Get Current User's Profile Success: ", res);
       let display_name = res.body.display_name;
       let email = res.body.email;
@@ -119,12 +143,32 @@ export default {
         images,
         share: false
       };
+      this.user_id = res.body.id;
+      this.shareable_link = `http://localhost:8080/user/${this.user_id}`
       sessionStorage.setItem("profile", JSON.stringify(filteredData));
-      this.$http.post("http://localhost:3000/storeuser", filteredData).then((response)=> {
-        console.log("Database op done")
-        console.log(response);
+
+
+      // Check database for user's data
+      this.$http.get(`http://localhost:3000/getuser/${this.user_id}`).then((res)=>{
+        console.log(res.status);
+      }).catch(err=> {
+        // If their data doesn't exist on db, request from spotify
+        if (err.status === 404) {
+          this.getUserData();
+        }
       })
+
+      // Store this user's profile in the database
+      this.$http.post("http://localhost:3000/storeuser", filteredData).then((response)=> {
+        console.log("User's profile stored successfully in db")
+        console.log(response);
+      }).catch(err=> {
+        console.log(err.status);
+      })
+
+
     }).catch(err=> {
+      // If the token sent with the request to user's profile is expired, remove all localStorage and sessionStorage associated with the token and request new token
       if (err && err.status === 401) {
         this.token_expired = true;
         localStorage.removeItem("state");
@@ -132,10 +176,8 @@ export default {
         sessionStorage.removeItem("profile");
       }
     })
-    } else {
-      console.log("sessionStorage is not empty, so do not make request", JSON.parse(sessionStorage.getItem("profile")));
-    }
 
+    // Query database for user data, if it doesn't exist, request data from spotify api
 
   }
 }
