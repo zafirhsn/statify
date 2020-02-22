@@ -23,12 +23,15 @@
 
     },
     beforeCreate() {
-      if (!localStorage.getItem("token")) {
-        console.log()
-      }
+      console.log("===SHARED===");
     },
     created() {
-
+      this.$http.get(`http://localhost:3000/getuser/${this.$route.params.id})`).then(res=> {
+        console.log(res);
+      }).catch(err=> {
+        // if ()
+        console.log(err);
+      })
     }
   }
 </script>

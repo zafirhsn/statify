@@ -90,6 +90,8 @@ import querystring from 'querystring';
     },
     beforeCreate() {
       console.log("===LOGIN===");
+    },
+    created() {
       // If a token exists in localStorage, check to see that it's less than a day old
       if (localStorage.getItem("token")) {
         let tokenObj = JSON.parse(localStorage.getItem("token"));
@@ -107,9 +109,6 @@ import querystring from 'querystring';
       } else {
         console.log("Localstorage is empty");
       }
-    },
-    created() {
-
     }
   }
   
