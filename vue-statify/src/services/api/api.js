@@ -1,5 +1,5 @@
 import VueResource from "vue-resource"
-import helper from "./helper"
+import helper from '../helper'
 import querystring from 'querystring';
 import Vue from "vue";
 

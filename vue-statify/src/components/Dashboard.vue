@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import querystring from 'querystring';
+// import querystring from 'querystring';
 import api from '../services/api/api';
 
 export default {

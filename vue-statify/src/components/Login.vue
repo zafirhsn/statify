@@ -50,6 +50,7 @@
 
 <script>
 import querystring from 'querystring';
+import helper from '../services/helper'
 
   export default {
     data() {
@@ -71,25 +72,31 @@ import querystring from 'querystring';
         localStorage.setItem("state", state);
         window.location = url;
       },
-      generateRandomString() {
-        let letters = "abcdefghijklmnopqrstuvwxyz";
-        let length = 16;
-        let state = "";
-        for (let i = 0; i < length; i++) {
-          state += letters[Math.floor(Math.random() * letters.length)];
-        }
-        return state;
-      },
-      tokenLessThanOneDay(tokenObj) {
-        let day = 24;
-        let expiration = Number(tokenObj.expires_in) * day;
-        let now = Math.floor(new Date().getTime() / 1000);
-        let time = tokenObj.time;
-        return (now - time < expiration)
-      }
+      // generateRandomString() {
+      //   let letters = "abcdefghijklmnopqrstuvwxyz";
+      //   let length = 16;
+      //   let state = "";
+      //   for (let i = 0; i < length; i++) {
+      //     state += letters[Math.floor(Math.random() * letters.length)];
+      //   }
+      //   return state;
+      // },
+      
+      // tokenLessThanOneDay(tokenObj) {
+      //   let day = 24;
+      //   let expiration = Number(tokenObj.expires_in) * day;
+      //   let now = Math.floor(new Date().getTime() / 1000);
+      //   let time = tokenObj.time;
+      //   return (now - time < expiration)
+      // }
+    
     },
     beforeCreate() {
       console.log("===LOGIN===");
+      console.log(this.$store.state.data_cached);
+      helper.setInitialState(this);
+      
+
     },
     created() {
       // If a token exists in localStorage, check to see that it's less than a day old
