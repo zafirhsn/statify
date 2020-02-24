@@ -49,73 +49,40 @@
 
 
 <script>
-import querystring from 'querystring';
 import helper from '../services/helper'
 
   export default {
     data() {
       return {
-
       }
     },
     methods: {
       authorizeUser() {
-        let state = this.generateRandomString();
-        let url  = "https://accounts.spotify.com/authorize?" + 
-        querystring.stringify({
-          client_id: "d4557495633b429a85292698a89e5978",
-          response_type: "token",
-          redirect_uri: "http://localhost:8080/dashboard",
-          state: state,
-          scope: "user-read-private user-read-email user-read-birthdate user-top-read user-library-read user-read-recently-played"
-        });
-        localStorage.setItem("state", state);
-        window.location = url;
-      },
-      // generateRandomString() {
-      //   let letters = "abcdefghijklmnopqrstuvwxyz";
-      //   let length = 16;
-      //   let state = "";
-      //   for (let i = 0; i < length; i++) {
-      //     state += letters[Math.floor(Math.random() * letters.length)];
-      //   }
-      //   return state;
-      // },
-      
-      // tokenLessThanOneDay(tokenObj) {
-      //   let day = 24;
-      //   let expiration = Number(tokenObj.expires_in) * day;
-      //   let now = Math.floor(new Date().getTime() / 1000);
-      //   let time = tokenObj.time;
-      //   return (now - time < expiration)
-      // }
-    
+        let obj = helper.generateAuthorizationString();
+        localStorage.setItem("state", obj.state);
+        window.location = obj.url;
+      }   
     },
     beforeCreate() {
-      console.log("===LOGIN===");
-      console.log(this.$store.state.data_cached);
       helper.setInitialState(this);
-      
+      console.log("===LOGIN===");
+      console.log("Data cached: " , this.$store.state.dataCached);
+      console.log("Logged In: ", this.$store.state.loggedIn);
+      console.log("Token Expired: ", this.$store.state.tokenExpired);
 
+      if (!this.$store.state.loggedIn && localStorage.getItem("token")) {
+        console.log("The user is not logged in but an old token remains in localStorage: ", JSON.parse(localStorage.getItem("token")));
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("data");
+        this.$store.state.dataCached = false;
+      }
+      else if (this.$store.state.loggedIn) {
+        console.log("The user is logged in: ", JSON.parse(localStorage.getItem("token")));
+        this.$router.push("/dashboard");
+      }
     },
     created() {
-      // If a token exists in localStorage, check to see that it's less than a day old
-      if (localStorage.getItem("token")) {
-        let tokenObj = JSON.parse(localStorage.getItem("token"));
-        console.log("localStorage['token'] exists:", tokenObj);
 
-        // If it is less than a day old, push dashboard
-        if (this.tokenLessThanOneDay(tokenObj)) {
-          console.log("The token is less than one day old, push dashboard")
-          this.$router.push("/dashboard");
-        } else {
-        // Otherwise, token is too old, delete storage
-          console.log("token is more than a day old, delete");
-          localStorage.removeItem("token");
-        }
-      } else {
-        console.log("Localstorage is empty");
-      }
     }
   }
   

@@ -7,6 +7,6 @@ export const store = new Vuex.Store({
   state: {
     loggedIn: false,
     tokenExpired: false,
-    dataCached: false
+    dataCached: false,
   }
 })
