@@ -38,6 +38,7 @@ export default {
     
     return Promise.all([comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50", options), comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50", options), comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50", options)])
   },
+
   saveUser(data, comp) {
     comp.$http.post("http://localhost:3000/storeuser", data).then(res=> {
       console.log(res);
@@ -48,6 +49,8 @@ export default {
   },
   async queryUser(id, comp) {
     return comp.$http.get(`http://localhost:3000/me/${id}`)
+  },
+  async getUser(id, comp) {
+    return comp.$http.get(`http://localhost:3000/getuser/${id}`)
   }
-  
 }

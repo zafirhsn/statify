@@ -33,7 +33,7 @@ export default {
       response_type: "token",
       redirect_uri: "http://localhost:8080/dashboard",
       state: state,
-      scope: "user-read-private user-read-email user-read-birthdate user-top-read user-library-read user-read-recently-played"
+      scope: "user-read-private user-read-email user-top-read playlist-modify-public playlist-modify-private"
     });
     return {state, url};
   },

@@ -7,7 +7,6 @@
 		</div>
 		<div class="row">
 			<div class="col">
-        <p>{{shareable_link}}</p>
 				<img id="pic" src="#" class="rounded-circle">
 			</div>
 		</div>
@@ -29,7 +28,7 @@ export default {
       display_name: "Zafir",
       clicked: false,
       token_expired: false,
-      user_id: "",
+      userId: "",
       shareable_link: "",
     }
   },
@@ -43,7 +42,7 @@ export default {
       navigator.clipboard.writeText(this.shareable_link).then(()=> {
         console.log("copying succesfull");
       })
-      this.shareable_link = "hello";
+    
     },
     /* eslint-disable */
     authorizeUser() {
@@ -55,10 +54,11 @@ export default {
   /* eslint-enable */,
   beforeCreate() {
     console.log("===DASHBOARD===")
+    helper.setInitialState(this);
     console.log("Data cached: " , this.$store.state.dataCached);
     console.log("Logged In: ", this.$store.state.loggedIn);
     console.log("Token Expired: ", this.$store.state.tokenExpired);
-    helper.setInitialState(this);
+
 
     const setState = async () => {
       if (!this.$store.state.loggedIn) {
@@ -81,6 +81,7 @@ export default {
           }
           else {
             hashObj["id"] = profileData.id;
+            hashObj["display_name"] = profileData.display_name;
           }
           // Get Listening Data
           let userData = await api.getUserData(access_token, this);
@@ -107,7 +108,28 @@ export default {
         }
       }
       if (this.$store.state.loggedIn) {
-        console.log("Logged In: ", JSON.parse(localStorage.getItem("token")));
+        console.log("Already Logged In: ", JSON.parse(localStorage.getItem("token")));
+        if (Object.keys(this.$store.state.sharedUser).length) {
+          if (this.$store.state.sharedUser.id === JSON.parse(localStorage.getItem("token")).id) {
+            console.log("this is you man");
+          } else {
+            console.log("This is a diff user")
+
+            try { 
+              this.$store.state.sharedUser = await api.getUser(this.$store.state.sharedUser.id, this);
+
+            } catch(e) {
+              if (e) {
+                if (e.status === 401) {
+                  console.log("You do not have permission to view this");
+                }
+                if (e.status === 404) {
+                  console.log("This user does not exist");
+                }
+              }
+            }
+          }
+        }
         if (!this.$store.state.dataCached) {
           console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")));
           let id = JSON.parse(localStorage.getItem("token")).id;
@@ -129,6 +151,12 @@ export default {
 
   },
   created() {
+    let tokenObj = JSON.parse(localStorage.getItem('token'));
+    // this.display_name = userObj.profile
+    this.userId = tokenObj.id;
+    this.shareable_link = `http://localhost:8080/user/${this.userId}`;
+
+
     
   }
 }

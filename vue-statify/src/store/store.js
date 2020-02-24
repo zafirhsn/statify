@@ -8,5 +8,6 @@ export const store = new Vuex.Store({
     loggedIn: false,
     tokenExpired: false,
     dataCached: false,
+    sharedUser: {}
   }
 })
