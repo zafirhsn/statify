@@ -1,4 +1,5 @@
 import querystring from 'querystring';
+import LZ from 'lz-string';
 
 
 export default {
@@ -80,6 +81,71 @@ export default {
     console.log("Data cached: ", comp.$store.state.dataCached);
     console.log("Logged In: ", comp.$store.state.loggedIn);
     console.log("Token Expired: ", comp.$store.state.tokenExpired);
+  },
+  cleanTrackData(data) {
+    let total = data.body.total;
+    let href = data.body.href;
+    let newData = {
+      total, 
+      href,
+      items: []
+    }
+    for(let item of data.body.items) {
+      let imageurl = "";
+      if(item.album.images.length) {
+        imageurl = item.album.images[item.album.images.length - 1].url;
+      }
+
+      let itemObj = {
+        images: imageurl,
+        artists: {
+          name: item.artists[0].name,
+          id: item.artists[0].id,
+          href: item.artists[0].href
+        },
+        href: item.href,
+        id: item.id, 
+        name: item.name, 
+        popularity: item.popularity
+      }
+      newData.items.push(itemObj);
+    }
+    return newData;
+  },
+  cleanArtistData(data) {
+    let total = data.body.total;
+    let href = data.body.href;
+    let newData = {
+      total,
+      href,
+      items: [],
+      genres: []
+    };
+    for (const [index, item] of data.body.items.entries()) {
+      newData.genres = newData.genres.concat(item.genres);
+      if (index < 10) {
+        let imageurl = "";
+        if (item.images.length) {
+          imageurl = item.images[item.images.length - 1].url;
+        } 
+
+        let itemObj = {
+          href: item.href,
+          id: item.id, 
+          images: imageurl,
+          name: item.name,
+          popularity: item.popularity,
+        }
+        newData.items.push(itemObj);
+      }
+    }
+    return newData;
+  },
+  compressData(obj) {
+    return LZ.compressToEncodedURIComponent(JSON.stringify(obj));
+  },
+  decompressData(str) {
+    return JSON.parse(LZ.decompressFromEncodedURIComponent(str));
   }
   
 }

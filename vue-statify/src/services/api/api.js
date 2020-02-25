@@ -5,49 +5,43 @@ Vue.use(VueResource);
 
 export default {
   async getCurrentUserProfile(access_token, comp) {
-    try {
-      let profile = await comp.$http.get("https://api.spotify.com/v1/me", {
-        headers: {
-          'Authorization': `Bearer ${access_token}`
-        }
-      });
-      console.log("Successfully got user's profile from Spotify");
-      let display_name = profile.body.display_name;
-      let email = profile.body.email;
-      let id = profile.body.id;
-      let images = profile.body.images;
-      let filteredData = {
-        display_name, 
-        email, 
-        id,
-        images
+    let profile = await comp.$http.get("https://api.spotify.com/v1/me", {
+      headers: {
+        'Authorization': `Bearer ${access_token}`
       }
-      return filteredData;
-    } catch(err) {
-      return err;
+    });
+    console.log("Successfully got user's profile from Spotify");
+    let display_name = profile.body.display_name;
+    let email = profile.body.email;
+    let id = profile.body.id;
+    let images = profile.body.images;
+    let filteredData = {
+      display_name, 
+      email, 
+      id,
+      images
     }
+    return filteredData;
   },
-  getUserData(access_token, comp) {
+  // TODO: change to "getUserListeningData"
+  async getUserListeningData(access_token, comp) {
     // Requesting all top artists on spotify
-    console.log("Requesting all top artists on spotify");
     let options = {
       headers: {
         "Authorization": `Bearer ${access_token}`
       }
     };
     
-    return Promise.all([comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50", options), comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50", options), comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50", options)])
+    let listeningData = await Promise.all([comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50", options), comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50", options), comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50", options)])
+    console.log("Successfully recieved listening data from Spotify");
+    return listeningData;
   },
 
-  saveUser(data, comp) {
-    comp.$http.post("http://localhost:3000/storeuser", data).then(res=> {
-      console.log(res);
-    }).catch(e=> {
-      console.log(e);
-    })
-    console.log("Successfully stored user's profile in database")
+  async saveUser(data, comp) {
+    return comp.$http.post("http://localhost:3000/storeuser", data);
+    // console.log("Successfully stored user's profile in database")
   },
-  async queryUser(id, comp) {
+  async getCurrentUser(id, comp) {
     return comp.$http.get(`http://localhost:3000/me/${id}`)
   },
   async getUser(id, comp) {
