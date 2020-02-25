@@ -26,7 +26,7 @@ import helper from '../services/helper';
     },
     beforeCreate() {
       console.log("===SHARED===");
-      helper.setInitialState(this);
+      helper.setState(this);
       helper.printState(this);
 
       console.log(typeof this.$route.params.id);

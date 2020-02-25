@@ -56,7 +56,7 @@ export default {
     let now = Math.floor(new Date().getTime() / 1000);
     return (now - tokenObj.time >= Number(tokenObj.expires_in));
   },
-  setInitialState(comp) {
+  setState(comp) {
     let tokenObj = {};
     if (localStorage.getItem("token")) {
       tokenObj = JSON.parse(localStorage.getItem("token"));

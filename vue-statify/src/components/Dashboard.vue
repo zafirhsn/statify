@@ -1,8 +1,13 @@
 <template>
   <div>
     <div class="row">
-			<div class="col" id="welcome" align="center">
-				<p>Welcome, {{display_name}}</p>
+			<div class="col" id="welcome">
+        <p>Welcome, {{display_name}}</p>
+        <!-- <p>Your id is {{user_id}}</p> -->
+        <h3>Your Top Artists From the Last Month</h3>
+        <ul>
+          <li v-for="(artist, index) of listening_data.data[0].items" :key="index">{{artist.name}}</li>
+        </ul>
 			</div>
 		</div>
 		<div class="row">
@@ -25,11 +30,14 @@ import helper from '../services/helper'
 export default {
   data() {
     return {
-      display_name: "Zafir",
+      display_name: "",
+      user_id: "",
+      shareable_link: "",
+      listening_data: {
+        data: []
+      },
       clicked: false,
       token_expired: false,
-      userId: "",
-      shareable_link: "",
     }
   },
   methods: {
@@ -55,13 +63,14 @@ export default {
   beforeCreate() {
     // Set the state of the application based on browser cache
     console.log("===DASHBOARD===")
-    helper.setInitialState(this);
+    helper.setState(this);
     console.log("Data cached: " , this.$store.state.dataCached);
     console.log("Logged In: ", this.$store.state.loggedIn);
     console.log("Token Expired: ", this.$store.state.tokenExpired);
+  },
+  created() {
 
-
-    const setState = async () => {
+    const updateState = async () => {
       if (!this.$store.state.loggedIn) {
         console.log("Not logged in: ", localStorage.getItem("token"));
 
@@ -86,7 +95,7 @@ export default {
             if (e & e.status === 401) {
               localStorage.removeItem("token");
               sessionStorage.removeItem("data");
-              helper.setInitialState(this);
+              helper.setState(this);
               this.$router.push('/');
             } else {
               console.log(e);
@@ -101,10 +110,12 @@ export default {
             id: profileData.id,
             data: []
           }
+          // Compress 
           for (let item of listeningData) {
             filteredListeningData.data.push(helper.compressData(helper.cleanArtistData(item)));
           }
 
+          // Save the data in the db
           try { 
             await api.saveUser(filteredListeningData, this);
             console.log("Successfully stored user's profile in database")
@@ -112,20 +123,29 @@ export default {
             console.log("There was an error saving the user to the db");
             localStorage.removeItem("token");
             sessionStorage.removeItem("data");
-            helper.setInitialState(this);
+            helper.setState(this);
             this.$router.push('/');
           }
 
           // Cache the data in sessionStorage
           sessionStorage.setItem("data", JSON.stringify(filteredListeningData.data));
-          helper.setInitialState(this);
+          helper.setState(this);
           console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")))
 
           // Cache the token with profile info in localStorage
           localStorage.setItem("token", JSON.stringify(hashObj));
-          helper.setInitialState(this);
+          helper.setState(this);
           console.log("Logged in: ", JSON.parse(localStorage.getItem("token")));
           console.log(this.$store.state.loggedIn);
+
+          // Set up Vue data vars 
+          this.display_name =  profileData.display_name;
+          this.user_id =  profileData.id;
+          this.shareable_link = `http://localhost:8080/user/${this.user_id}`;
+
+          for (let item of listeningData) {
+            this.listening_data.data.push(helper.cleanArtistData(item));
+          }
         }
         else { 
           this.$router.push("/");
@@ -133,6 +153,7 @@ export default {
       }
       if (this.$store.state.loggedIn) {
         console.log("Already Logged In: ", JSON.parse(localStorage.getItem("token")));
+        
         if (Object.keys(this.$store.state.sharedUser).length) {
           if (this.$store.state.sharedUser.id === JSON.parse(localStorage.getItem("token")).id) {
             console.log("this is you man");
@@ -154,34 +175,36 @@ export default {
             }
           }
         }
+    
+
         if (!this.$store.state.dataCached) {
           console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")));
           let id = JSON.parse(localStorage.getItem("token")).id;
-          let userData = await api.queryUser(id, this);
+          let userData = await api.getCurrentUser(id, this);
           helper.printState(this);
-          sessionStorage.setItem("data", JSON.stringify(userData.body));
-          helper.setInitialState(this);
+
+          sessionStorage.setItem("data", JSON.stringify(userData.body.data));
+          helper.setState(this);
           console.log("Data wasn't cached, but we got it from db");
         }
+
+        let profile = JSON.parse(localStorage.getItem("token"));
+        this.display_name = profile.display_name;
+        this.user_id = profile.id;
+        this.shareable_link = `http://localhost:8080/user/${this.user_id}`
+        let dataArr = JSON.parse(sessionStorage.getItem("data"));
+          for (let item of dataArr) {
+            this.listening_data.data.push(helper.decompressData(item));
+          }
+        
       }
       helper.printState(this);
-
-
     }
 
-    setState().then().catch(e=> {
+    updateState().then().catch(e=> {
       console.log(e);
     });
 
-  },
-  created() {
-    // let tokenObj = JSON.parse(localStorage.getItem('token'));
-    // // this.display_name = userObj.profile
-    // this.userId = tokenObj.id;
-    // this.shareable_link = `http://localhost:8080/user/${this.userId}`;
-
-
-    
   }
 }
 </script>

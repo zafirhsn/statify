@@ -64,7 +64,7 @@ import helper from '../services/helper'
       }   
     },
     beforeCreate() {
-      helper.setInitialState(this);
+      helper.setState(this);
       console.log("===LOGIN===");
       console.log("Data cached: " , this.$store.state.dataCached);
       console.log("Logged In: ", this.$store.state.loggedIn);

@@ -23,7 +23,6 @@ export default {
     }
     return filteredData;
   },
-  // TODO: change to "getUserListeningData"
   async getUserListeningData(access_token, comp) {
     // Requesting all top artists on spotify
     let options = {
