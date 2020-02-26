@@ -4,10 +4,12 @@
 			<div class="col" id="welcome">
         <p>Welcome, {{display_name}}</p>
         <!-- <p>Your id is {{user_id}}</p> -->
-        <h3>Your Top Artists From the Last Month</h3>
+        <h2>Your Top Artists From the Last Month</h2>
         <ul>
           <li v-for="(artist, index) of listening_data.data[0].items" :key="index">{{artist.name}}</li>
         </ul>
+        <h2>Your Top Artists From the Last 6 Months</h2>
+          <li v-for="(artist, index) of listening_data.data[1].items" :key="index">{{artist.name}}</li>
 			</div>
 		</div>
 		<div class="row">
@@ -181,7 +183,6 @@ export default {
           console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")));
           let id = JSON.parse(localStorage.getItem("token")).id;
           let userData = await api.getCurrentUser(id, this);
-          helper.printState(this);
 
           sessionStorage.setItem("data", JSON.stringify(userData.body.data));
           helper.setState(this);

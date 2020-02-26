@@ -54,6 +54,7 @@ import helper from '../services/helper'
   export default {
     data() {
       return {
+        backendURL: process.env.VUE_APP_BACKEND_URL
       }
     },
     methods: {
@@ -82,7 +83,8 @@ import helper from '../services/helper'
       }
     },
     created() {
-
+      console.log("====TESTING ENV VARS===")
+      console.log(this.backendURL);
     }
   }
   

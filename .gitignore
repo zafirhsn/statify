@@ -5,3 +5,5 @@ public/css/*.css.map
 #Node modules
 node_modules/
 
+.env
+

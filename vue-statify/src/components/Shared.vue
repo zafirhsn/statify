@@ -7,18 +7,37 @@
 			</div>
 		</div>
     <div> 
-      This is data. Enjoy it. Savor it. 
+      <div class="col" id="welcome">
+        <p>Welcome, {{listening_data.profile.id}}</p>
+        <!-- <p>Your id is {{user_id}}</p> -->
+        <h2>Your Top Artists From the Last Month</h2>
+        <ul>
+          <li v-for="(artist, index) of listening_data.data[0].items" :key="index">{{artist.name}}</li>
+        </ul>
+        <h2>Your Top Artists From the Last 6 Months</h2>
+        <ul>
+          <li v-for="(artist, index) of listening_data.data[1].items" :key="index">{{artist.name}}</li>
+        </ul>
+			</div>
+      <p v-if="error">{{errMsg}}</p>
     </div>
   </div>
 </template>
 
 <script>
 import helper from '../services/helper';
+import api from '../services/api/api'
 
   export default {
     data() {
       return {
-
+        listening_data: {
+          profile: {},
+          data: []
+        },
+        error: false,
+        errMsg: "",
+        dataArrived: false
       }
     },
     methods: {
@@ -36,12 +55,25 @@ import helper from '../services/helper';
       }
     },
     created() {
-      // this.$http.get(`http://localhost:3000/getuser/${this.$route.params.id})`).then(res=> {
-      //   console.log(res);
-      // }).catch(err=> {
-      //   // if ()
-      //   console.log(err);
-      // })
+      api.getUser(this.$store.state.sharedUser.id, this).then(res=> {
+        console.log(res);
+        this.listening_data.profile = res.body.profile;
+
+        for (let item of res.body.data) {
+          this.listening_data.data.push(helper.decompressData(item));
+        }
+        
+        console.log(this.listening_data.data);
+      }).catch(e=> {
+        if (e && e.status === 401) {
+          this.errMsg = "You do not have permission to view this data";
+          this.error = true;
+        } 
+        else if (e && e.status === 404) {
+          this.errMsg = "That user does not exist";
+          this.error = true;
+        }
+      })
     }
   }
 </script>
