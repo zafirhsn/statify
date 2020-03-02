@@ -31,7 +31,13 @@ export default {
       }
     };
     
-    let listeningData = await Promise.all([comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50", options), comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50", options), comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50", options)])
+    let listeningData = await Promise.all([
+      comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50", options), 
+      comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50", options), 
+      comp.$http.get("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50", options), 
+      comp.$http.get("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50", options),
+      comp.$http.get("https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=50", options),
+      comp.$http.get("https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50", options)])
     console.log("Successfully recieved listening data from Spotify");
     return listeningData;
   },

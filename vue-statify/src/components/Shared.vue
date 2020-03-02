@@ -4,19 +4,10 @@
     <!-- Conditionally render button if user is not logged in -->
     <v-row>
       <v-col>
-        <p>Welcome, {{listening_data.profile.id}}</p>
-        <!-- <p>Your id is {{user_id}}</p> -->
-        <h2>Your Top Artists From the Last Month</h2>
-        <ul>
-          <li v-for="(artist, index) of listening_data.data[0].items" :key="index">{{artist.name}}</li>
-        </ul>
-        <h2>Your Top Artists From the Last 6 Months</h2>
-        <ul>
-          <li v-for="(artist, index) of listening_data.data[1].items" :key="index">{{artist.name}}</li>
-        </ul>
-			</v-col>
-      <p v-if="error">{{errMsg}}</p>
+        <p>{{sharedUser.profile.display_name}}</p>
+      </v-col>
     </v-row>
+
   </v-container>
 </template>
 
@@ -27,9 +18,13 @@ import api from '../services/api/api'
   export default {
     data() {
       return {
-        listening_data: {
+        sharedUser: {
+          id: "",
           profile: {},
-          data: []
+          data: {
+            artists: [],
+            tracks: []
+          }
         },
         error: false,
         errMsg: "",
@@ -53,13 +48,21 @@ import api from '../services/api/api'
     created() {
       api.getUser(this.$store.state.sharedUser.id, this).then(res=> {
         console.log(res);
-        this.listening_data.profile = res.body.profile;
-
-        for (let item of res.body.data) {
-          this.listening_data.data.push(helper.decompressData(item));
+        this.sharedUser.profile = res.body.profile;
+        this.sharedUser.id = res.body.id;
+      
+        for (let key of res.body.data) {
+          res.body.data[key].forEach(item=> {
+            if (key === "artists") {
+              this.sharedUser.data.artists.push(helper.decompressData(item));
+            } else {
+              this.sharedUser.data.tracks.push(helper.decompressData(item));
+            }
+          
+          })
         }
         
-        console.log(this.listening_data.data);
+        console.log(this.sharedUser.data);
       }).catch(e=> {
         if (e && e.status === 401) {
           this.errMsg = "You do not have permission to view this data";

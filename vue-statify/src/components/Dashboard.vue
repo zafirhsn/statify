@@ -6,26 +6,88 @@
       <!-- User image here -->
       <img class="profile-img" :src="profile_image">
     </v-app-bar>
+
     <v-row class="mt-12">
-			<v-col id="welcome" class="mt-12">
-        <p>Welcome, {{display_name}}</p>
-        <!-- <p>Your id is {{user_id}}</p> -->
-        <h2>Your Top Artists From the Last Month</h2>
-        <ul>
-          <li v-for="(artist, index) of listening_data.data[0].items" :key="index">{{artist.name}}</li>
-        </ul>
-        <h2>Your Top Artists From the Last 6 Months</h2>
-          <li v-for="(artist, index) of listening_data.data[1].items" :key="index">{{artist.name}}</li>
-			</v-col>
+      <v-col class="mt-12" align="center">
+        <!-- Profile Picture Here --> 
+        <img class="welcome-image" :src="profile_image">
+      </v-col>
     </v-row>
-    
-		<v-row>
-			<v-col>
+
+    <v-row>
+      <v-col align="center">
+        <!-- Welcome message -->
+        <h1 class="display-3">{{display_name}}</h1> 
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col align="center">
+        <!-- Share button and input field link --> 
         <v-btn @click="share()">Share</v-btn>
         <v-text-field ref="shareInput" :value="shareable_link" v-show="clicked"></v-text-field>
         <button type="button" @click="authorizeUser()" v-if="token_expired">Refresh Data</button>
       </v-col>
     </v-row>
+
+    <v-row>
+      <v-col>
+        <!-- Conditionally render generate playlist button --> 
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col align="center">
+        <!-- At a Glance --> 
+        <h1 class="display-1">At a Glance</h1>
+      </v-col>
+      <v-col align="center">
+        <!-- Conditionally render col for shared user at a glance -->
+        <p>At a glance for other user</p>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <!-- Top artists of last month  --> 
+        <h2 class="display-1">Your Top Artists From the Last Month</h2>
+        <ul>
+          <li v-for="(artist, index) of listening_data.artists[0].items" :key="index">{{artist.name}}</li>
+        </ul>
+      </v-col>
+
+      <v-col align="center">
+        <p>Shared user top artists</p>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <!-- Top tracks of last month  --> 
+          <h2>Your Top Tracks From the Last Month</h2>
+          <li v-for="(track, index) of listening_data.tracks[0].items" :key="index">{{track.name}} by {{track.artists.name}}</li>
+      </v-col>
+
+      <v-col align="center">
+        <p>Shared user top tracks</p>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <!-- Word cloud genre  --> 
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <!-- Share button and input field  --> 
+        <v-btn @click="share()">Share</v-btn>
+        <v-text-field ref="shareInput" :value="shareable_link" v-show="clicked"></v-text-field>
+        <button type="button" @click="authorizeUser()" v-if="token_expired">Refresh Data</button>
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 
@@ -42,7 +104,8 @@ export default {
       profile_image: "",
       shareable_link: "",
       listening_data: {
-        data: []
+        artists: [],
+        tracks: []
       },
       clicked: false,
       token_expired: false,
@@ -117,12 +180,22 @@ export default {
           let filteredListeningData = {
             profile: profileData,
             id: profileData.id,
-            data: []
+            data: {
+              artists: [],
+              tracks: [],
+            }
           }
           // Compress 
-          for (let item of listeningData) {
-            filteredListeningData.data.push(helper.compressData(helper.cleanArtistData(item)));
-          }
+          listeningData.forEach((item, index)=> {
+            if (index < 3) {
+              filteredListeningData.data.artists.push(helper.compressData(helper.cleanArtistData(item)));
+            } else {
+              filteredListeningData.data.tracks.push(helper.compressData(helper.cleanTrackData(item)))
+            }
+          })
+          console.log("THIS IS THE LISTENING DATA", listeningData);
+            
+          
 
           // Save the data in the db
           try { 
@@ -153,9 +226,16 @@ export default {
           this.shareable_link = `http://localhost:8080/user/${this.user_id}`;
           this.profile_image = profileData.images[0].url;
 
-          for (let item of listeningData) {
-            this.listening_data.data.push(helper.cleanArtistData(item));
-          }
+          listeningData.forEach((item, index)=> {
+            if (index < 3) {
+              this.listening_data.artists.push(helper.cleanArtistData(item));
+            } else {
+              this.listening_data.tracks.push(helper.cleanTrackData(item));
+            }
+
+          })
+
+          
         }
         else { 
           this.$router.push("/");
@@ -171,8 +251,10 @@ export default {
             console.log("This is a diff user")
 
             try { 
-              this.$store.state.sharedUser = await api.getUser(this.$store.state.sharedUser.id, this);
-
+              let sharedUser = await api.getUser(this.$store.state.sharedUser.id, this);
+              this.$store.state.sharedUser.profile = sharedUser.body.profile;
+              this.$store.state.sharedUser.data = sharedUser.body.data;
+              console.log(this.$store.state.sharedUser);
             } catch(e) {
               if (e) {
                 if (e.status === 401) {
@@ -203,9 +285,16 @@ export default {
         this.profile_image = profile.profile_image;
         this.shareable_link = `http://localhost:8080/user/${this.user_id}`
         let dataArr = JSON.parse(sessionStorage.getItem("data"));
-          for (let item of dataArr) {
-            this.listening_data.data.push(helper.decompressData(item));
-          }
+        
+        for (let key in dataArr) {
+          dataArr[key].forEach((item)=> {
+            if (key === "artists") {
+              this.listening_data.artists.push(helper.decompressData(item))
+            } else {
+              this.listening_data.tracks.push(helper.decompressData(item));
+            }
+          })
+        }
         
       }
       helper.printState(this);
@@ -226,14 +315,19 @@ export default {
     border-radius: 30px;
   }
 
-  .container {
+  img.welcome-image {
+    height: 150px;
+    width: auto;
+    border-radius: 5px;
+  }
+
+/*   .container {
     height: 100%;
     background: #00a264;
     background: -moz-linear-gradient(45deg, #00a264 10%, #8b00be 100%);
     background: -webkit-linear-gradient(45deg, #00a264 10%, #8b00be 100%);
     background: linear-gradient(45deg, #00a264 10%, #8b00be 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#00a264", endColorstr="#8b00be",GradientType=1 );
-    /*			background-image: url("purple-green.png");*/
-    }
+    } */
 
 </style>
