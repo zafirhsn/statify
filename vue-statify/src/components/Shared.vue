@@ -1,13 +1,9 @@
 <template>
-  <div>
-
-		<div class="row">
-			<div class="col">
-				<img id="pic" src="#" class="rounded-circle">
-			</div>
-		</div>
-    <div> 
-      <div class="col" id="welcome">
+  <v-container>
+    <!-- Navbar Here -->
+    <!-- Conditionally render button if user is not logged in -->
+    <v-row>
+      <v-col>
         <p>Welcome, {{listening_data.profile.id}}</p>
         <!-- <p>Your id is {{user_id}}</p> -->
         <h2>Your Top Artists From the Last Month</h2>
@@ -18,10 +14,10 @@
         <ul>
           <li v-for="(artist, index) of listening_data.data[1].items" :key="index">{{artist.name}}</li>
         </ul>
-			</div>
+			</v-col>
       <p v-if="error">{{errMsg}}</p>
-    </div>
-  </div>
+    </v-row>
+  </v-container>
 </template>
 
 <script>

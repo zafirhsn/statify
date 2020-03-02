@@ -1,49 +1,37 @@
 <template>   
-  <div class="container" id="login">
-    
-    <div class="row">
-      <div class="col home-title" align="center">
-        <i class="fa fa-bar-chart" aria-hidden="true"></i>
-        <p>Statify</p>
-      </div>
-    </div>
+  <v-container fluid>
+    <v-row class="ma-5">
+      <v-col align="center">
+        <!-- TODO: Pick a better name -->
+        <h1 class="display-4">Statify</h1>
+        <p class="subtitle-1">Your music in numbers</p>
+      </v-col>
+    </v-row>
 
-    <div class="row">
-      <div class="col home-descrip" align="center">
-        <p>This site uses Spotify's web API to give users a glance at their listening habits and statistics<br><br> 
-        Connect your Spotify Account to</p>
-      </div>
-    </div>
+    <v-row class="ma-12" justify="center">
+      <v-col align="center" justify="center" sm="4" md="3" xl="2" >   
+        <!-- TODO: Dynamically change icon size -->
+        <i class="fas fa-headphones fa-5x"></i>
+        <p class="title mt-3">Visualize Your Music</p>
+        <p>See your top artists, track, and genres over time</p>
+      </v-col>
+      <v-col align="center" justify="center" sm="4" md="3" xl="2">
+        <i class="fas fa-user-friends fa-5x"></i>
+        <p class="title mt-3">Share With Friends</p>
+        <p>Swap links with friends to compare</p>
+      </v-col>
+    </v-row>
 
-    <div class="row">
-      <div class="col home-list">	   
-        <ul> 
-        <li>Check out your top tracks and artists from the last 4 weeks, 6 months, or of all time</li>
-        <li>Find out which of your songs are happier, easier to dance to, have more energy, are more instrumental or vocal and more</li>
-        <li>Find the average popularity of the artists in your library and see how obscure your music tastes are</li>
-        <li>Put in the name of a playlist you own
-          <ul>
-          <li>Danceabilty</li>
-          <li>Valence</li>
-          <li>Tempo</li>
-          <li>And more...</li>	
-          </ul>	
-        </li>	
-        </ul>
-      </div>
-    </div>
+    <v-row class="mt-12">
+      <v-col align="center">
+        <v-btn color="#1DB954" class="white--text" x-large rounded @click="authorizeUser()"><img src="../assets//Spotify_Icon_RGB_White.png">Connect to Spotify</v-btn>
+      </v-col>
+    </v-row>
+
     
-    <div class="row">
-      <div class ="col" align="center">
-        <br>
-        <br>
-        <button type="button" id="login-button" class="btn btn-success btn-lg" data-target="button" @click="authorizeUser()">Connect to Spotify</button>
-        <br>
-        <br>
-        <br>	
-      </div>
-    </div>
-  </div>
+
+        
+  </v-container>
 
 </template>
 
@@ -91,6 +79,30 @@ import helper from '../services/helper'
 
 </script>
 
-<style>
+<style scoped>
+  img {
+    height: 30px;
+    width: auto;
+    margin-right: 10px;
+  }
+
+  .container {
+    height: 100%;
+      /*background-color: #000000;*/
+    /*#5B00BA*/
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#5b00ba+0,c57e14+100 */
+    background: #5b00ba;
+    /* Old browsers */
+    background: -moz-linear-gradient(45deg, #5b00ba 0%, #c57e14 90%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #5b00ba 0%, #c57e14 90%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #5b00ba 0%, #c57e14 90%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#5b00ba", endColorstr="#c57e14",GradientType=1 );
+    /* IE6-9 fallback on horizontal gradient */
+    font-family: "Roboto", sans-serif;
+    color: #fff;
+  }
 
 </style>

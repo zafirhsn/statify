@@ -1,7 +1,13 @@
 <template>
-  <div>
-    <div class="row">
-			<div class="col" id="welcome">
+  <v-container fluid>
+    <!-- Navbar here -->
+    <v-app-bar fixed elevate-on-scroll height="80" color="indigo">
+      <v-spacer></v-spacer>
+      <!-- User image here -->
+      <img class="profile-img" :src="profile_image">
+    </v-app-bar>
+    <v-row class="mt-12">
+			<v-col id="welcome" class="mt-12">
         <p>Welcome, {{display_name}}</p>
         <!-- <p>Your id is {{user_id}}</p> -->
         <h2>Your Top Artists From the Last Month</h2>
@@ -10,18 +16,17 @@
         </ul>
         <h2>Your Top Artists From the Last 6 Months</h2>
           <li v-for="(artist, index) of listening_data.data[1].items" :key="index">{{artist.name}}</li>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<img id="pic" src="#" class="rounded-circle">
-			</div>
-		</div>
-    <button type="button" @click="share()">Share</button>
-    <input ref="shareInput" type="text" :value="shareable_link" v-show="clicked">
-
-    <button type="button" @click="authorizeUser()" v-if="token_expired">Refresh Data</button>
-  </div>
+			</v-col>
+    </v-row>
+    
+		<v-row>
+			<v-col>
+        <v-btn @click="share()">Share</v-btn>
+        <v-text-field ref="shareInput" :value="shareable_link" v-show="clicked"></v-text-field>
+        <button type="button" @click="authorizeUser()" v-if="token_expired">Refresh Data</button>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -34,6 +39,7 @@ export default {
     return {
       display_name: "",
       user_id: "",
+      profile_image: "",
       shareable_link: "",
       listening_data: {
         data: []
@@ -46,8 +52,8 @@ export default {
     share() {
       this.clicked = true;
       console.log(this.$refs);
-      this.$refs.shareInput.focus();
-      this.$refs.shareInput.select();
+      // console.log(this.$refs.shareInput);
+      // this.$refs.shareInput.select();
       // document.execCommand("copy");
       navigator.clipboard.writeText(this.shareable_link).then(()=> {
         console.log("copying succesfull");
@@ -106,6 +112,7 @@ export default {
           // Add id and display_name to hasObj that will be stored in localStorage
           hashObj["id"] = profileData.id;
           hashObj["display_name"] = profileData.display_name;
+          hashObj["profile_image"] = profileData.images[0].url;
 
           let filteredListeningData = {
             profile: profileData,
@@ -144,6 +151,7 @@ export default {
           this.display_name =  profileData.display_name;
           this.user_id =  profileData.id;
           this.shareable_link = `http://localhost:8080/user/${this.user_id}`;
+          this.profile_image = profileData.images[0].url;
 
           for (let item of listeningData) {
             this.listening_data.data.push(helper.cleanArtistData(item));
@@ -192,6 +200,7 @@ export default {
         let profile = JSON.parse(localStorage.getItem("token"));
         this.display_name = profile.display_name;
         this.user_id = profile.id;
+        this.profile_image = profile.profile_image;
         this.shareable_link = `http://localhost:8080/user/${this.user_id}`
         let dataArr = JSON.parse(sessionStorage.getItem("data"));
           for (let item of dataArr) {
@@ -211,5 +220,20 @@ export default {
 </script>
 
 <style scoped>
+  img.profile-img {
+    height: 55px;
+    width: auto;
+    border-radius: 30px;
+  }
+
+  .container {
+    height: 100%;
+    background: #00a264;
+    background: -moz-linear-gradient(45deg, #00a264 10%, #8b00be 100%);
+    background: -webkit-linear-gradient(45deg, #00a264 10%, #8b00be 100%);
+    background: linear-gradient(45deg, #00a264 10%, #8b00be 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#00a264", endColorstr="#8b00be",GradientType=1 );
+    /*			background-image: url("purple-green.png");*/
+    }
 
 </style>
