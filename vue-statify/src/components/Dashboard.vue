@@ -41,9 +41,10 @@
         <!-- At a Glance --> 
         <h1 class="display-1">At a Glance</h1>
       </v-col>
-      <v-col align="center">
+      <v-col align="center" v-if="compareData">
         <!-- Conditionally render col for shared user at a glance -->
         <p>At a glance for other user</p>
+        <p>{{sharedUser.data.tracks[0].items[0].name}}</p>
       </v-col>
     </v-row>
 
@@ -74,8 +75,9 @@
     </v-row>
 
     <v-row>
-      <v-col>
+      <v-col id="wordcloud" ref="wordcloud">
         <!-- Word cloud genre  --> 
+
       </v-col>
     </v-row>
 
@@ -95,6 +97,7 @@
 // import querystring from 'querystring';
 import api from '../services/api/api';
 import helper from '../services/helper'
+import wordcloud from '../../node_modules/wordcloud';
 
 export default {
   data() {
@@ -109,6 +112,8 @@ export default {
       },
       clicked: false,
       token_expired: false,
+      compareData: false,
+      sharedUser: {}
     }
   },
   methods: {
@@ -232,7 +237,6 @@ export default {
             } else {
               this.listening_data.tracks.push(helper.cleanTrackData(item));
             }
-
           })
 
           
@@ -251,9 +255,22 @@ export default {
             console.log("This is a diff user")
 
             try { 
-              let sharedUser = await api.getUser(this.$store.state.sharedUser.id, this);
-              this.$store.state.sharedUser.profile = sharedUser.body.profile;
-              this.$store.state.sharedUser.data = sharedUser.body.data;
+              let user = await api.getUser(this.$store.state.sharedUser.id, this);
+              this.$store.state.sharedUser.profile = user.body.profile;
+              this.$store.state.sharedUser.data = { artists:[], tracks:[] }
+
+              for (let key in user.body.data) {
+                user.body.data[key].forEach(item=> {
+                  if (key === "artists") {
+                    this.$store.state.sharedUser.data.artists.push(helper.decompressData(item))
+                  } else {
+                    this.$store.state.sharedUser.data.tracks.push(helper.decompressData(item))
+                  }
+                })
+              }
+              this.sharedUser = this.$store.state.sharedUser;
+              console.log("sharedUser", this.sharedUser);
+              this.compareData = true;
               console.log(this.$store.state.sharedUser);
             } catch(e) {
               if (e) {
@@ -304,6 +321,36 @@ export default {
       console.log(e);
     });
 
+  },
+  mounted() {
+    let topGenres = {};
+        for (let genre of this.listening_data.artists[0].genres) {
+          if (topGenres[genre]) {
+            topGenres[genre]++;
+          } else {
+            topGenres[genre] = 1;
+          }
+        }
+        console.log(this.$refs);
+        let wordcloudlist = [];
+        for (let key in topGenres) {
+          wordcloudlist.push([key, topGenres[key]]);
+        }
+        wordcloudlist.sort((a,b)=> {
+          return b[1] - a[1];
+        })
+        // let finalList = wordcloudlist.splice(0,40);
+        // console.log(wordcloudlist)
+
+        // console.log(finalList);
+        wordcloud(document.getElementById("wordcloud"), {
+          list: wordcloudlist,
+          minSize: "14px",
+          weightFactor: 10,
+          gridSize: 10,
+          color: "random-dark"
+        })
+        // wordcloud.
   }
 }
 </script>
@@ -319,6 +366,10 @@ export default {
     height: 150px;
     width: auto;
     border-radius: 5px;
+  }
+
+  #wordcloud {
+    height: 300px;
   }
 
 /*   .container {

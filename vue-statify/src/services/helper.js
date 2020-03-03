@@ -146,6 +146,6 @@ export default {
   },
   decompressData(str) {
     return JSON.parse(LZ.decompressFromEncodedURIComponent(str));
-  }
+  },
   
 }
