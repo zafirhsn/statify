@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container>
     <!-- Navbar here -->
     <!-- TODO: maybe make this collapsible to the right -->
     <v-app-bar fixed elevate-on-scroll height="80" color="indigo">
@@ -24,16 +24,9 @@
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col align="center">
-        <!-- Share button and input field link --> 
-        <!-- TODO: Turn share button into a switch-->
-        <v-switch inset color="#1DB954" label="Share Link" messages="Anyone with this link can view your data" v-model="clicked" class="label" @click="share()">Share</v-switch>
-        <!-- TODO: Custom style the input field -->
-        <v-text-field ref="shareInput" :value="shareable_link" v-show="clicked"></v-text-field>
-        <button type="button" @click="authorizeUser()" v-if="token_expired">Refresh Data</button>
-      </v-col>
-    </v-row>
+    <share-link :shareable_link="shareable_link" :clicked="clicked" @updateClicked="clicked = $event"></share-link>
+
+    <v-divider></v-divider>
 
     <v-row v-if="compareData">
       <v-col>
@@ -44,131 +37,109 @@
     <v-row>
       <v-col align="center">
         <!-- At a Glance --> 
-        <v-row>
+        <v-row class="mb-5">
           <v-col>
-            <h1 class="display-1">At a Glance</h1>
+            <h1 class="display-1">At a Glance <span v-if="compareData">for You</span></h1>
           </v-col>
         </v-row>
-
         <v-row>
-          <v-col>
-            <p class="title">Top Artist</p>
-            <v-list>
-              <v-list-item>
-                <v-list-item-avatar tile size="48" class="custom-avatar">
-                  <v-img :src="listening_data.artists[2].items[0].images"></v-img>
-                </v-list-item-avatar>
-    
-                <v-list-item-content align="start">
-                  <v-list-item-title>
-                    {{listening_data.artists[2].items[0].name}}
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-col>
-          <v-col>
-            <p class="title">Top Track</p>
-            <v-list>
-              <v-list-item>
-                <v-list-item-avatar tile size="48" class="custom-avatar">
-                  <v-img :src="listening_data.tracks[2].items[0].images"></v-img>
-                </v-list-item-avatar>
-    
-                <v-list-item-content align="start">
-                  <v-list-item-title>
-                    {{listening_data.tracks[2].items[0].name}}
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-col>
-          <v-col>
-            <p class="title">Top Genre</p>
-          </v-col>
+          <top-item :images="listening_data.artists[2].items[0].images" type="artist" :name="listening_data.artists[2].items[0].name"
+          ></top-item>
+          <top-item :images="listening_data.tracks[2].items[0].images" type="track" :name="listening_data.tracks[2].items[0].name"></top-item>
+          <top-item type="genre" :name="topGenre"></top-item>
         </v-row>
-
       </v-col>
-
-
+  
       <v-col align="center" v-if="compareData">
         <!-- Conditionally render col for shared user at a glance -->
         <v-row>
           <v-col>
-            <h1 class="display-1">At a Glance</h1>
+            <h1 class="display-1">At a Glance <span v-if="compareData">for {{sharedUser.profile.display_name}}</span></h1>
           </v-col>
         </v-row>
 
         <v-row>
-          <v-col>
-            <p>At a glance for other user</p>
-          </v-col>
-          <v-col>
-            <p>{{sharedUser.data.tracks[0].items[0].name}}</p>
-          </v-col>
-          <v-col>
-            aslkjalkj
-          </v-col>
+          <top-item :images="sharedUser.data.artists[0].items[0].images" type="artist" :name="sharedUser.data.artists[0].items[0].name"
+          ></top-item>
+          <top-item :images="sharedUser.data.tracks[0].items[0].images" type="track" :name="sharedUser.data.tracks[0].items[0].name"></top-item>
+          <top-item type="genre" :name="topGenre"></top-item>
         </v-row>
-        
       </v-col>
-    </v-row>
 
+    </v-row>
+    <v-divider class="mb-3"></v-divider>
     <v-row>
       <v-col>
         <!-- Top artists of last month  --> 
         <!-- TODO: Turn list bullets into artist pic -->
         <!-- TODO: Add skeleton loader using v-if directive-->
-        <h2 class="display-1">Your Top Artists From the Last Month</h2>
-        <v-list>
-          
-          <v-list-item v-for="(artist, index) of listening_data.artists[0].items" :key="index">
-            <v-list-item-avatar tile size="48" class="custom-avatar">
+        <h2 class="display-1 mb-7">Your Top Artists From the Last Month</h2>
+
+        <v-row>
+          <v-col v-for="(artist, index) of listening_data.artists[0].items" :key="index" sm="2" class="mr-5">
+            <div class="custom-list-item">
+            <v-avatar tile size="48" class="custom-avatar">
               <v-img :src="artist.images"></v-img>
-            </v-list-item-avatar>
-
-            <v-list-item-content>
-              <v-list-item-title>
-                {{artist.name}}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-
-        </v-list>
+            </v-avatar>
+            <span class="artist-name">{{artist.name}}</span>
+          </div>
+          </v-col>
+        </v-row>
       </v-col>
 
       <v-col align="center" v-if="compareData">
-        <p>Shared user top artists</p>
+        <h2 class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top Artists From the Last Month</h2>
+
+        <v-row>
+          <v-col v-for="(artist, index) of sharedUser.data.artists[0].items" :key="index" sm="2" class="ml-5">
+            <div class="custom-list-item">
+            <v-avatar tile size="48" class="custom-avatar">
+              <v-img :src="artist.images"></v-img>
+            </v-avatar>
+            <span class="artist-name">{{artist.name}}</span>
+          </div>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
-
+    <v-divider class="mb-3"></v-divider>
     <v-row>
       <v-col>
         <!-- Top tracks of last month  -->
         <!-- TODO: Turn list bullets into album art -->
-          <h2 class="display-1">Your Top Tracks From the Last Month</h2>
-          <v-list>
-          
-            <v-list-item v-for="(track, index) of filteredTracks[0]" :key="index">
-              <v-list-item-avatar tile class="custom-avatar">
-                <v-img :src="track.images"></v-img>
-              </v-list-item-avatar>
-  
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{track.name}} by {{track.artists.name}}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
+        <h2 class="display-1 mb-7">Your Top Tracks From the Last Month</h2>
+
+        <v-row>
+          <v-col v-for="(track, index) of filteredTracks[0]" :key="index" sm="2" class="mr-5">
+            <div class="custom-list-item">
+            <v-avatar tile size="48" class="custom-avatar">
+              <v-img :src="track.images"></v-img>
+            </v-avatar>
+            <span class="artist-name">{{track.name}} by {{track.artists.name}}</span>
+          </div>
+          </v-col>
+        </v-row>
+
       </v-col>
 
       <v-col align="center" v-if="compareData">
-        <p>Shared user top tracks</p>
+        <h2 class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top Tracks From the Last Month</h2>
+
+        <v-row>
+          <v-col v-for="(track, index) of filteredTracks[0]" :key="index" sm="2" class="mr-5">
+            <div class="custom-list-item">
+            <v-avatar tile size="48" class="custom-avatar">
+              <v-img :src="track.images"></v-img>
+            </v-avatar>
+            <span class="artist-name">{{track.name}} by {{track.artists.name}}</span>
+          </div>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
-
+    <v-divider class="mb-10"></v-divider>
     <v-row>
+      <p class="display-1 mb-5">Your Top Genres</p>
       <v-col id="wordcloud" ref="wordcloud">
         <!-- Word cloud genre  --> 
 
@@ -185,14 +156,7 @@
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col>
-        <!-- Share button and input field  --> 
-        <v-switch inset color="#1DB954" label="Share Link" v-model="clicked" hint="Share this" messages="Anyone with this link can view your data" @click="share()">Share</v-switch>
-        <v-text-field ref="shareInput" :value="shareable_link" v-show="clicked"></v-text-field>
-        <button type="button" @click="authorizeUser()" v-if="token_expired">Refresh Data</button>
-      </v-col>
-    </v-row>
+    <share-link :shareable_link="shareable_link" :clicked="clicked" @updateClicked="clicked = $event"></share-link>
 
   </v-container>
 </template>
@@ -202,6 +166,8 @@
 import api from '../services/api/api';
 import helper from '../services/helper'
 import wordcloud from '../../node_modules/wordcloud';
+import _TopItem from './_TopItem.vue';
+import _ShareLink from './_ShareLink.vue';
 
 export default {
   data() {
@@ -221,6 +187,10 @@ export default {
       sharedUser: {}
     }
   },
+  components: {
+    'top-item': _TopItem,
+    'share-link': _ShareLink
+  },
   computed: {
     filteredTracks() {
       let trackData = [];
@@ -233,9 +203,25 @@ export default {
       }
       return trackData;
     },
-    // topGenre() {
-
-    // }
+    topGenre() {
+      let topGenres = {};
+        for (let genre of this.listening_data.artists[2].genres) {
+          if (topGenres[genre]) {
+            topGenres[genre]++;
+          } else {
+            topGenres[genre] = 1;
+          }
+        }
+      let max = 0; 
+      let maxKey = "";
+      for (let key in topGenres) {
+        if (topGenres[key] > max) {
+          max = topGenres[key];
+          maxKey = key;
+        }
+      }
+      return maxKey;
+    }
   },
   methods: {
     share() {
@@ -502,8 +488,12 @@ export default {
     }
   }
 
-  .label {
-    max-width: 250px;
+  .artist-name {
+    display: inline-block;
+    margin-left: 10px;
+  }
+  .custom-list-item {
+    align-content: center;
   }
 
 /*   .container {
