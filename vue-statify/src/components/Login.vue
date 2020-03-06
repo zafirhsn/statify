@@ -3,22 +3,35 @@
     <v-row class="ma-5">
       <v-col align="center">
         <!-- TODO: Pick a better name -->
-        <h1 class="display-4">Statify</h1>
+        <h1 class="display-4 font-weight-thin">Statify</h1>
         <p class="subtitle-1">Your music in numbers</p>
       </v-col>
     </v-row>
 
     <v-row class="ma-12" justify="center">
-      <v-col align="center" justify="center" sm="4" md="3" xl="2" >   
-        <!-- TODO: Dynamically change icon size -->
-        <i class="fas fa-headphones fa-5x"></i>
-        <p class="title mt-3">Visualize Your Music</p>
-        <p>See your top artists, track, and genres over time</p>
+      <v-col align="center" justify="center">   
+        <v-card raised>
+          <i class="fas fa-headphones fa-5x mt-10"></i>
+          <v-card-title  style="justify-content: center;">
+            <p class="title mt-3 font-weight-regular">Visualize Your Music</p>
+          </v-card-title>
+          <v-divider class="mt-n4 mb-5"></v-divider>
+          <v-card-subtitle>
+            <p>See your top artists, tracks, and genres over time</p>
+          </v-card-subtitle>
+        </v-card>
       </v-col>
-      <v-col align="center" justify="center" sm="4" md="3" xl="2">
-        <i class="fas fa-user-friends fa-5x"></i>
-        <p class="title mt-3">Share With Friends</p>
-        <p>Swap links with friends to compare</p>
+      <v-col align="center" justify="center">
+        <v-card raised>
+          <i class="fas fa-user-friends fa-5x mt-10"></i>
+          <v-card-title style="justify-content: center;">
+            <p class="title mt-3 font-weight-regular">Share With Friends</p>
+          </v-card-title>
+          <v-divider class="mt-n4 mb-5"></v-divider>
+          <v-card-subtitle>
+            <p>Swap links with friends to compare</p>
+          </v-card-subtitle>
+        </v-card>
       </v-col>
     </v-row>
 
@@ -27,10 +40,7 @@
         <v-btn color="#1DB954" class="white--text" x-large rounded @click="authorizeUser()"><img src="../assets//Spotify_Icon_RGB_White.png">Connect to Spotify</v-btn>
       </v-col>
     </v-row>
-
-    
-
-        
+      
   </v-container>
 
 </template>

@@ -1,6 +1,6 @@
 <template>
   <v-col>
-    <p class="title">Top {{Uppercasetype}}</p>
+    <p class="headline font-weight-light">Top {{Uppercasetype}}</p>
 
     <v-list>
       <v-list-item class="center-list">
@@ -61,5 +61,11 @@
   .content-center {
     flex: none;
   }
+
+  .headline {
+    text-decoration: underline;
+  }
+
+
 
 </style>

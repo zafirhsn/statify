@@ -2,12 +2,55 @@
   <v-container>
     <!-- Navbar here -->
     <!-- TODO: maybe make this collapsible to the right -->
-    <v-app-bar fixed elevate-on-scroll height="80" color="indigo">
+    <v-app-bar fixed elevate-on-scroll height="80" color="white">
       <v-spacer></v-spacer>
       <!-- User image here -->
         <!-- TODO: Turn image into a floating button with a background image that is the profile picture-->
-        <v-btn rounded></v-btn>
-      <img class="profile-img" :src="profile_image">
+
+      <v-menu :close-on-content-click=vuetify.closeOnContentClick offset-y transition="slide-y-transition">
+        <template v-slot:activator="{on}">
+          <v-btn fab v-on="on">
+            <v-avatar size="52">
+              <v-img :src="profile_image"></v-img>
+            </v-avatar>
+          </v-btn>
+        </template>
+
+        <v-card>
+          <v-list>
+            <v-list-item>
+              <v-list-item-avatar>
+                <img :src="profile_image" alt="Profile picture">
+              </v-list-item-avatar>   
+              
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{display_name}}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  Sharing <span v-if="clicked">On</span><span v-if="!clicked">Off</span>
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+            <v-divider></v-divider>
+          <v-list>
+            <v-list-item>
+              <v-list-item-action>
+                <v-switch inset v-model="clicked" color="#1DB954" label="Sharing" @click="share()" id="menuShareSwitch"></v-switch>
+              </v-list-item-action>
+            </v-list-item>
+
+            <v-list-item>
+              <v-list-item-action>
+                <v-btn block color="#1DB954" class="white--text" @click="logout()">Log Out</v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-menu>
+      
+
     </v-app-bar>
 
     <v-row class="mt-12">
@@ -15,15 +58,19 @@
         <!-- Profile Picture Here --> 
         <img class="welcome-image" :src="profile_image">
       </v-col>
+      <v-col  class="mt-12" align="center" v-if="compareData">
+        <img class="welcome-image" :src="sharedUser.profile.images[0].url" v-if="compareData">
+      </v-col>
     </v-row>
 
     <v-row>
       <v-col align="center">
         <!-- Welcome message -->
-        <h1 class="display-3">{{display_name}}</h1> 
+        <span class="display-3 font-weight-thin">{{display_name}}</span><span class="display-3 font-weight-thin" v-if="compareData" style="display: inline;"><span class="display-1 font-weight-light"> and</span> {{sharedUser.profile.display_name}} </span>
       </v-col>
     </v-row>
 
+    <!-- ^ SHARE-LINK COMPONENT -->
     <share-link :shareable_link="shareable_link" :clicked="clicked" @updateClicked="clicked = $event"></share-link>
 
     <v-divider></v-divider>
@@ -43,10 +90,14 @@
           </v-col>
         </v-row>
         <v-row>
+          
           <top-item :images="listening_data.artists[2].items[0].images" type="artist" :name="listening_data.artists[2].items[0].name"
           ></top-item>
+
           <top-item :images="listening_data.tracks[2].items[0].images" type="track" :name="listening_data.tracks[2].items[0].name"></top-item>
+
           <top-item type="genre" :name="topGenre"></top-item>
+
         </v-row>
       </v-col>
   
@@ -65,86 +116,35 @@
           <top-item type="genre" :name="topGenre"></top-item>
         </v-row>
       </v-col>
-
     </v-row>
+
+    <v-divider class="mb-3"></v-divider>
+
+    <!-- ^ TOP-LISTS COMPONENT -->
+    <top-lists :sharedUser="sharedUser" :listening_data="listening_data" :compareData="compareData" listType="artists"></top-lists>
+
+    <v-divider class="mb-3"></v-divider>
+
+    <top-lists :sharedUser="sharedUser" :listening_data="listening_data" :compareData="compareData" listType="tracks"></top-lists>
+
+
     <v-divider class="mb-3"></v-divider>
     <v-row>
       <v-col>
-        <!-- Top artists of last month  --> 
-        <!-- TODO: Turn list bullets into artist pic -->
-        <!-- TODO: Add skeleton loader using v-if directive-->
-        <h2 class="display-1 mb-7">Your Top Artists From the Last Month</h2>
-
-        <v-row>
-          <v-col v-for="(artist, index) of listening_data.artists[0].items" :key="index" sm="2" class="mr-5">
-            <div class="custom-list-item">
-            <v-avatar tile size="48" class="custom-avatar">
-              <v-img :src="artist.images"></v-img>
-            </v-avatar>
-            <span class="artist-name">{{artist.name}}</span>
-          </div>
-          </v-col>
-        </v-row>
+        <h1 class="display-1 mb-12">Your Top Genres</h1>
+        <div id="wordcloud" ref="wordcloud">
+          <!-- Word cloud genre  --> 
+        </div>
       </v-col>
 
-      <v-col align="center" v-if="compareData">
-        <h2 class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top Artists From the Last Month</h2>
-
-        <v-row>
-          <v-col v-for="(artist, index) of sharedUser.data.artists[0].items" :key="index" sm="2" class="ml-5">
-            <div class="custom-list-item">
-            <v-avatar tile size="48" class="custom-avatar">
-              <v-img :src="artist.images"></v-img>
-            </v-avatar>
-            <span class="artist-name">{{artist.name}}</span>
-          </div>
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
-    <v-divider class="mb-3"></v-divider>
-    <v-row>
-      <v-col>
-        <!-- Top tracks of last month  -->
-        <!-- TODO: Turn list bullets into album art -->
-        <h2 class="display-1 mb-7">Your Top Tracks From the Last Month</h2>
-
-        <v-row>
-          <v-col v-for="(track, index) of filteredTracks[0]" :key="index" sm="2" class="mr-5">
-            <div class="custom-list-item">
-            <v-avatar tile size="48" class="custom-avatar">
-              <v-img :src="track.images"></v-img>
-            </v-avatar>
-            <span class="artist-name">{{track.name}} by {{track.artists.name}}</span>
-          </div>
-          </v-col>
-        </v-row>
-
+      <!-- TODO: conditionally render shared user word cloud -->
+      <v-col v-if="compareData">
+        <h1 class="display-1 mb-12">{{sharedUser.profile.display_name}}'s Top Genres</h1>
+        <div id="wordcloud2" ref="wordcloud">
+          <!-- Word cloud genre  --> 
+        </div>
       </v-col>
 
-      <v-col align="center" v-if="compareData">
-        <h2 class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top Tracks From the Last Month</h2>
-
-        <v-row>
-          <v-col v-for="(track, index) of filteredTracks[0]" :key="index" sm="2" class="mr-5">
-            <div class="custom-list-item">
-            <v-avatar tile size="48" class="custom-avatar">
-              <v-img :src="track.images"></v-img>
-            </v-avatar>
-            <span class="artist-name">{{track.name}} by {{track.artists.name}}</span>
-          </div>
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
-    <v-divider class="mb-10"></v-divider>
-    <v-row>
-      <p class="display-1 mb-5">Your Top Genres</p>
-      <v-col id="wordcloud" ref="wordcloud">
-        <!-- Word cloud genre  --> 
-
-      </v-col>
-        <!-- TODO: conditionally render shared user word cloud -->
     </v-row>
 
     <v-row>
@@ -168,6 +168,7 @@ import helper from '../services/helper'
 import wordcloud from '../../node_modules/wordcloud';
 import _TopItem from './_TopItem.vue';
 import _ShareLink from './_ShareLink.vue';
+import _TopLists from './_TopLists.vue';
 
 export default {
   data() {
@@ -181,15 +182,23 @@ export default {
         tracks: []
       },
       clicked: false,
-      token_expired: false,
-      // TODO: Set compareData to false at small viewport sizes
       compareData: false,
-      sharedUser: {}
+      sharedUser: {},
+      vuetify: {
+        closeOnContentClick: false
+      }
+
     }
   },
   components: {
     'top-item': _TopItem,
-    'share-link': _ShareLink
+    'share-link': _ShareLink,
+    'top-lists': _TopLists
+  },
+  watch: {
+    clicked() {
+      console.log(this.clicked);
+    }
   },
   computed: {
     filteredTracks() {
@@ -237,6 +246,12 @@ export default {
       let obj = helper.generateAuthorizationString();
       localStorage.setItem("state", obj.state);
       window.location = obj.url;
+    },
+    logout() {
+      sessionStorage.removeItem("data");
+      localStorage.removeItem("token");
+      helper.setState(this);
+      this.$router.push('/');
     }
   }
   /* eslint-enable */,
@@ -442,24 +457,39 @@ export default {
         for (let key in topGenres) {
           wordcloudlist.push([key, topGenres[key]]);
         }
-        wordcloudlist.sort((a,b)=> {
-          return b[1] - a[1];
-        })
-        // let finalList = wordcloudlist.splice(0,40);
-        // console.log(wordcloudlist)
-
-        // console.log(finalList);
-
-        // TODO: Make word cloud mobile friendly
+        
+        // let viewportWidth = document.documentElement.clientWidth;
         wordcloud(document.getElementById("wordcloud"), {
           list: wordcloudlist,
-          minSize: "14px",
+          minSize: "8",
           weightFactor: 10,
           gridSize: 10,
           color: "random-dark"
         })
-        // wordcloud.
-  }
+
+        let topGenres2 = {};
+        for (let genre of this.sharedUser.data.artists[0].genres) {
+          if (topGenres2[genre]) {
+            topGenres2[genre]++;
+          } else {
+            topGenres2[genre] = 1;
+          }
+        }
+        console.log(this.$refs);
+        let wordcloudlist2 = [];
+        for (let key in topGenres2) {
+          wordcloudlist2.push([key, topGenres[key]]);
+        }
+
+
+        wordcloud(document.getElementById("wordcloud2"), {
+          list: wordcloudlist2,
+          minSize: "8",
+          weightFactor: 10,
+          gridSize: 10,
+          color: "random-dark"
+        })
+      }
 }
 </script>
 
@@ -495,6 +525,11 @@ export default {
   .custom-list-item {
     align-content: center;
   }
+
+  h1 {
+    text-decoration: underline;
+  }
+
 
 /*   .container {
     height: 100%;
