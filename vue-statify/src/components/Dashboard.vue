@@ -121,14 +121,79 @@
     <v-divider class="mb-3"></v-divider>
 
     <!-- ^ TOP-LISTS COMPONENT -->
-    <top-lists :sharedUser="sharedUser" :listening_data="listening_data" :compareData="compareData" listType="artists"></top-lists>
+
+    <v-row>
+
+      <v-col>
+
+        <h2 :align="align" class="display-1 mb-7">Your Top Artists From              
+          <span v-if="Number(artistTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(artistTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(artistTimeFrame)===2">All Time</span>
+        </h2>
+        <v-radio-group v-model="artistTimeFrame" row="row" active-class="radio-class">
+          <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
+          <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
+          <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
+        </v-radio-group>
+        <top-lists :data="listening_data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame">
+        </top-lists>
+      </v-col>
+
+      <v-divider vertical v-if="compareData"></v-divider>
+
+      <v-col v-if="compareData">
+        <h2 :align="align" class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top Artists From           
+          <span v-if="Number(artistTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(artistTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(artistTimeFrame)===2">All Time</span>
+        </h2>
+        <top-lists :data="sharedUser.data" :compareData="compareData" listType="artists">
+        </top-lists>
+
+      </v-col>
+
+    </v-row>
+
 
     <v-divider class="mb-3"></v-divider>
 
-    <top-lists :sharedUser="sharedUser" :listening_data="listening_data" :compareData="compareData" listType="tracks"></top-lists>
+
+    <v-row>
+
+      <v-col>
+        <h2 :align="align" class="display-1 mb-7">Your Top Tracks From 
+          <span v-if="Number(trackTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(trackTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(trackTimeFrame)===2">All Time</span>
+        </h2>
+        <v-radio-group v-model="trackTimeFrame" :row="row">
+          <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
+          <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
+          <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
+        </v-radio-group>
+        <top-lists :data="listening_data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame">
+        </top-lists>
+      </v-col>
+
+      <v-divider vertical v-if="compareData"></v-divider>
+
+      <v-col v-if="compareData">
+        <h2 :align="align" class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top Artists From
+          <span v-if="Number(trackTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(trackTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(trackTimeFrame)===2">All Time</span>
+        </h2>
+        <top-lists :data="sharedUser.data" :compareData="compareData" listType="tracks">
+        </top-lists>
+      </v-col>
+
+    </v-row>
 
 
     <v-divider class="mb-3"></v-divider>
+
+
     <v-row>
       <v-col>
         <h1 class="display-1 mb-12">Your Top Genres</h1>
@@ -186,7 +251,10 @@ export default {
       sharedUser: {},
       vuetify: {
         closeOnContentClick: false
-      }
+      },
+      artistTimeFrame: 0,
+      trackTimeFrame: 0,
+      row: true
 
     }
   },
@@ -198,9 +266,18 @@ export default {
   watch: {
     clicked() {
       console.log(this.clicked);
+    },
+    radioGroup() {
+      console.log(this.radioGroup)
     }
   },
   computed: {
+    align() {
+        if (this.compareData) {
+          return "center";
+        }
+        return "start"
+    },
     filteredTracks() {
       let trackData = [];
       for (let track of this.listening_data.tracks) {
@@ -433,6 +510,7 @@ export default {
             }
           })
         }
+        console.log(this.listening_data);
         
       }
       helper.printState(this);
@@ -461,29 +539,6 @@ export default {
         // let viewportWidth = document.documentElement.clientWidth;
         wordcloud(document.getElementById("wordcloud"), {
           list: wordcloudlist,
-          minSize: "8",
-          weightFactor: 10,
-          gridSize: 10,
-          color: "random-dark"
-        })
-
-        let topGenres2 = {};
-        for (let genre of this.sharedUser.data.artists[0].genres) {
-          if (topGenres2[genre]) {
-            topGenres2[genre]++;
-          } else {
-            topGenres2[genre] = 1;
-          }
-        }
-        console.log(this.$refs);
-        let wordcloudlist2 = [];
-        for (let key in topGenres2) {
-          wordcloudlist2.push([key, topGenres[key]]);
-        }
-
-
-        wordcloud(document.getElementById("wordcloud2"), {
-          list: wordcloudlist2,
           minSize: "8",
           weightFactor: 10,
           gridSize: 10,
@@ -526,8 +581,11 @@ export default {
     align-content: center;
   }
 
-  h1 {
+  h2 {
     text-decoration: underline;
+  }
+  .radio-class {
+    color: #1DB954;
   }
 
 

@@ -1,56 +1,22 @@
 <template>
   <v-row>
-  <v-col>
-    <!-- Top artists of last month  --> 
-    <!-- TODO: Turn list bullets into artist pic -->
-    <!-- TODO: Add skeleton loader using v-if directive-->
-    <h2 :align="align" class="display-1 mb-7">Your Top {{capitalizedListType}} From the Last Month</h2>
+    <v-col v-for="(item, index) of userData[Number(timeFrameCaught)].items" :key="index" :sm="numColSm" :md="numColMd" :lg="numColLg">
+      <v-list>
+        <v-list-item>
+          <v-list-item-avatar tile size="56" class="custom-avatar">
+            <v-img :src="item.images"></v-img>
+          </v-list-item-avatar>
 
-    <v-row>
-      <v-col v-for="(item, index) of userData[0].items" :key="index" :sm="numColSm" :md="numColMd" :lg="numColLg">
-        <v-list>
-          <v-list-item>
-            <v-list-item-avatar tile size="56" class="custom-avatar">
-              <v-img :src="item.images"></v-img>
-            </v-list-item-avatar>
-
-            <v-list-item-content>
-              <v-list-item-title>
-                <span v-if="listType==='artists'">{{index+1}}. {{item.name}}</span>
-                <span v-if="listType==='tracks'">{{index+1}}. {{item.name}} by {{item.artists.name}}</span>
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-col>
-    </v-row>
-  </v-col>
-
-  <v-divider vertical v-if="compareData"></v-divider>
-  
-  <v-col v-if="compareData">
-    <h2 :align="align" class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top {{capitalizedListType}} From the Last Month</h2>
-
-    <v-row>
-      <v-col v-for="(item, index) of sharedUserData[0].items" :key="index" :sm="numColSm" :md="numColMd" :lg="numColLg">
-        <v-list>
-          <v-list-item>
-            <v-list-item-avatar tile size="56" class="custom-avatar">
-              <v-img :src="item.images"></v-img>
-            </v-list-item-avatar>
-
-            <v-list-item-content>
-              <v-list-item-title>
-                <span v-if="listType==='artists'" style="width:100%">{{index+1}}. {{item.name}}</span>
-                <span v-if="listType==='tracks'">{{index+1}}. {{item.name}} by {{item.artists.name}}</span>
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-col>
-    </v-row>
-  </v-col>
-</v-row>
+          <v-list-item-content>
+            <v-list-item-title>
+              <span v-if="listType==='artists'">{{index+1}}. {{item.name}}</span>
+              <span v-if="listType==='tracks'">{{index+1}}. {{item.name}} by {{item.artists.name}}</span>
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -60,57 +26,38 @@
       }
     },
     props: {
-      sharedUser: Object,
-      listening_data: Object,
+      data: Object,
       compareData: Boolean,
       listType: String,
       timeFrame: Number
     },
     computed: {
+      timeFrameCaught() {
+        if (!this.timeFrame) {
+          return 0
+        }
+        return this.timeFrame
+      },
       userData() {
         if (this.listType === "artists") {
-          return this.listening_data.artists;
+          return this.data.artists;
         } else if (this.listType === "tracks") {
           let filteredData = { 
-            profile: this.listening_data.profile,
-            artists: this.listening_data.artists,
+            profile: this.data.profile,
+            artists: this.data.artists,
             tracks: []  
           }
-          for (let res of this.listening_data.tracks) {
+          for (let res of this.data.tracks) {
             let temp = [];
             for (let i = 0; i < 10; i++) {
               temp.push(res.items[i]);
             }
             filteredData.tracks.push({items: temp});
           }
+          console.log(filteredData)
           return filteredData.tracks;
           }
-          return this.listening_data.artists;
-      },
-      sharedUserData() {
-        if (this.listType === "artists") {
-          return this.sharedUser.data.artists;
-        } else if (this.listType === "tracks") {
-          let filteredData = { 
-            profile: this.sharedUser.profile,
-            data: {
-              artists: this.sharedUser.data.artists,
-              tracks: []
-            }
-          }
-          for (let res of this.sharedUser.data.tracks) {
-            let temp = [];
-            for (let i = 0; i < 10; i++) {
-              temp.push(res.items[i]);
-            }
-            filteredData.data.tracks.push({items: temp})
-          }
-          return filteredData.data.tracks;
-        }
-        return this.sharedUserData.data.artists;
-      },
-      capitalizedListType() {
-        return this.listType[0].toUpperCase() + this.listType.substring(1, this.listType.length);
+        return this.data.artists;
       },
       numColSm() {
         if (this.compareData) {
@@ -144,12 +91,6 @@
           return 6;
         }
         return 4;
-      },
-      align() {
-        if (this.compareData) {
-          return "center";
-        }
-        return "start"
       }
     }
   }

@@ -115,4 +115,12 @@ import helper from '../services/helper'
     color: #fff;
   }
 
+  .v-card__title {
+    word-break: normal;
+  }
+
+  .col {
+    min-width: 200px;
+  }
+
 </style>

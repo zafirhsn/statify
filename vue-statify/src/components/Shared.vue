@@ -21,29 +21,47 @@
       </v-col>
     </v-row>
 
-    <!-- <v-row>
+    <v-row>
       <v-col align="center">
+
         <v-row class="mb-5">
           <v-col>
-            <h1 class="display-1">At a Glance <span v-if="compareData">for You</span></h1>
+            <h1 class="display-1">At a Glance for {{display_name}}</h1>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row>  
           <top-item :images="listening_data.artists[0].items[0].images" type="artist" :name="listening_data.artists[0].items[0].name"
           ></top-item>
+
           <top-item :images="listening_data.tracks[0].items[0].images" type="track" :name="listening_data.tracks[0].items[0].name"></top-item>
+
           <top-item type="genre" :name="topGenre"></top-item>
         </v-row>
       </v-col>
+    </v-row>
 
-    </v-row> -->
-    <v-divider class="mb-3"></v-divider>
-
-    <top-lists v-if="dataArrived" :listening_data="listening_data" :compareData="compareData" listType="artists"></top-lists>
 
     <v-divider class="mb-3"></v-divider>
 
-    <top-lists :listening_data="listening_data" :compareData="compareData" listType="tracks"></top-lists>
+
+    <v-row>
+      <v-col>
+        <h2 align="start" class="display-1 mb-7">{{display_name}}'s Top Artists From the Last Month</h2>
+        <top-lists :data="listening_data" listType="artists">
+        </top-lists>
+      </v-col>
+    </v-row>
+
+    <v-divider class="mb-3"></v-divider>
+
+    <v-row>
+      <v-col>
+        <h2 align="start" class="display-1 mb-7">{{display_name}}'s Top Tracks From the Last Month</h2>
+        <top-lists :data="listening_data" listType="tracks">
+        </top-lists>
+      </v-col>
+    </v-row>
+
 
   </v-container>
 </template>
@@ -51,7 +69,7 @@
 <script>
 import helper from '../services/helper';
 import api from '../services/api/api'
-// import _TopItem from './_TopItem.vue';
+import _TopItem from './_TopItem.vue';
 import _TopLists from './_TopLists.vue'
 
   export default {
@@ -70,8 +88,29 @@ import _TopLists from './_TopLists.vue'
         compareData: false
       }
     },
+    computed: {
+      topGenre() {
+      let topGenres = {};
+        for (let genre of this.listening_data.artists[0].genres) {
+          if (topGenres[genre]) {
+            topGenres[genre]++;
+          } else {
+            topGenres[genre] = 1;
+          }
+        }
+      let max = 0; 
+      let maxKey = "";
+      for (let key in topGenres) {
+        if (topGenres[key] > max) {
+          max = topGenres[key];
+          maxKey = key;
+        }
+      }
+      return maxKey;
+      }
+    },
     components: {
-      // 'top-item': _TopItem
+      'top-item': _TopItem,
       'top-lists': _TopLists
     },
     methods: {
@@ -82,7 +121,7 @@ import _TopLists from './_TopLists.vue'
       helper.setState(this);
       helper.printState(this);
 
-      console.log(typeof this.$route.params.id);
+      // console.log(typeof this.$route.params.id);
       this.$store.state.sharedUser = { id : this.$route.params.id };
       if (this.$store.state.loggedIn) {
         this.$router.push('/dashboard');
@@ -90,12 +129,12 @@ import _TopLists from './_TopLists.vue'
     },
     created() {
       api.getUser(this.$store.state.sharedUser.id, this).then(res=> {
-        console.log(res);
+        // console.log(res);
         this.display_name = res.body.profile.display_name;
         this.user_id = res.body.profile.id;
         this.profile_image = res.body.profile.images[0].url;
-      
-        for (let key of res.body.data) {
+
+        for (let key in res.body.data) {
           res.body.data[key].forEach(item=> {
             if (key === "artists") {
               this.listening_data.artists.push(helper.decompressData(item));
@@ -106,7 +145,6 @@ import _TopLists from './_TopLists.vue'
           })
         }
         console.log(this.listening_data);
-        this.dataArrived
       }).catch(e=> {
         if (e && e.status === 401) {
           this.errMsg = "You do not have permission to view this data";
@@ -131,6 +169,10 @@ import _TopLists from './_TopLists.vue'
     height: 150px;
     width: auto;
     border-radius: 5px;
+  }
+
+  h2 {
+    text-decoration: underline;
   }
 
 
