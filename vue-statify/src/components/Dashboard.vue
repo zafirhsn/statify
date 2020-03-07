@@ -89,7 +89,7 @@
     </v-row>
 
     <!-- ^ SHARE-LINK COMPONENT -->
-    <share-link :shareable_link="shareable_link" :sharing="sharing" @updateSharing="sharing = $event"></share-link>
+    <share-link :shareable_link="shareable_link" :sharing="sharing" :compareData="compareData" :sharedUserExists="sharedUserExists" @updateCompare="compareData = $event" @updateSharing="sharing = $event"></share-link>
 
     <!-- <v-divider class="mb-3"></v-divider> -->
 
@@ -304,6 +304,7 @@ export default {
       },
       sharedUser: {},
       sharing: false,
+      sharedUserExists: false,
       compareData: false,
       artistTimeFrame: 0,
       trackTimeFrame: 0,
@@ -356,6 +357,7 @@ export default {
   methods: {
     logout() {
       sessionStorage.removeItem("data");
+      sessionStorage.removeItem("sharedUser");
       localStorage.removeItem("token");
       helper.setState(this);
       this.$router.push('/');
@@ -369,198 +371,9 @@ export default {
     console.log("Data cached: " , this.$store.state.dataCached);
     console.log("Logged In: ", this.$store.state.loggedIn);
     console.log("Token Expired: ", this.$store.state.tokenExpired);
+    console.log("sharedUser", this.$store.state.sharedUser);
   },
   created() {
-
-    // const updateState = async () => {
-    //   if (!this.$store.state.loggedIn) {
-    //     console.log("Not logged in: ", localStorage.getItem("token"));
-
-    //     if (helper.validHashParams()) {
-    //       console.log("Valid hash in URL");
-
-    //       // Get the params from the url and store them in an object. Add a timestamp to the object and create the string access token as well
-    //       let hashObj = helper.getHashParams();
-    //       let time = Math.floor(new Date().getTime() / 1000);
-    //       hashObj["time"] = time;
-    //       let access_token = JSON.stringify(hashObj.access_token);
-    //       access_token = access_token.slice(1, access_token.length - 1);
-
-    //       // Get profile data and listening data
-    //       let listeningData;
-    //       let profileData;
-
-    //       try {
-    //         listeningData = await api.getUserListeningData(access_token, this);
-    //         profileData = await api.getCurrentUserProfile(access_token, this);
-    //       } catch (e) {
-    //         if (e & e.status === 401) {
-    //           localStorage.removeItem("token");
-    //           sessionStorage.removeItem("data");
-    //           helper.setState(this);
-    //           this.$router.push('/');
-    //         } else {
-    //           // TODO: GIVE USER AN ERROR MESSAGE, APPLICATION IS NOT AVAILABLE, SOMETHING
-    //           console.log(e);
-    //         }
-    //       }
-    //       // Add id and display_name to hasObj that will be stored in localStorage
-    //       hashObj["id"] = profileData.id;
-    //       hashObj["display_name"] = profileData.display_name;
-    //       if (profileData.images.length) {
-    //         hashObj["profile_image"] = profileData.images[0].url;
-    //       } else {
-    //         hashObj["profile_image"] = "https://picsum.photos/id/1025/250/250.jpg?grayscale"
-    //       }
-
-    //       let filteredListeningData = {
-    //         profile: profileData,
-    //         id: profileData.id,
-    //         data: {
-    //           artists: [],
-    //           tracks: [],
-    //         }
-    //       }
-    //       // Compress 
-    //       listeningData.forEach((item, index)=> {
-    //         // HARDCODE
-    //         if (index < 3) {
-    //           filteredListeningData.data.artists.push(helper.compressData(helper.cleanArtistData(item)));
-    //         } else {
-    //           filteredListeningData.data.tracks.push(helper.compressData(helper.cleanTrackData(item)))
-    //         }
-    //       })
-    //       console.log("THIS IS THE LISTENING DATA", listeningData);
-            
-          
-
-    //       // Save the data in the db
-    //       try { 
-    //         await api.saveUser(filteredListeningData, this);
-    //         console.log("Successfully stored user's profile in database")
-    //       } catch(e) {
-    //         console.log("There was an error saving the user to the db");
-    //         localStorage.removeItem("token");
-    //         sessionStorage.removeItem("data");
-    //         helper.setState(this);
-    //         this.$router.push('/');
-    //       }
-
-    //       // Cache the data in sessionStorage
-    //       sessionStorage.setItem("data", JSON.stringify(filteredListeningData.data));
-    //       helper.setState(this);
-    //       console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")))
-
-    //       // Cache the token with profile info in localStorage
-    //       localStorage.setItem("token", JSON.stringify(hashObj));
-    //       helper.setState(this);
-    //       console.log("Logged in: ", JSON.parse(localStorage.getItem("token")));
-    //       console.log(this.$store.state.loggedIn);
-
-    //       // Set up Vue data vars 
-    //       this.display_name =  profileData.display_name;
-    //       this.user_id =  profileData.id;
-    //       this.shareable_link = `${process.env.VUE_APP_FRONTEND_URL}/user/${this.user_id}`;
-    //       if (profileData.images.length) {
-    //         this.profile_image = profileData.images[0].url;
-    //       } else {
-    //         this.profile_image = "https://picsum.photos/id/1025/250/250.jpg?grayscale"
-    //       }
-          
-    //       listeningData.forEach((item, index)=> {
-    //         // HARDCODE
-    //         if (index < 3) {
-    //           this.listening_data.artists.push(helper.cleanArtistData(item));
-    //         } else {
-    //           this.listening_data.tracks.push(helper.cleanTrackData(item));
-    //         }
-    //       })
-    //     }
-    //     else {
-    //       localStorage.removeItem("token");
-    //       sessionStorage.removeItem("data");
-    //       helper.setState(this);
-    //       this.$router.push("/");
-    //     }
-    //   }
-    //   if (this.$store.state.loggedIn) {
-    //     console.log("Already Logged In: ", JSON.parse(localStorage.getItem("token")));
-        
-    //     if (Object.keys(this.$store.state.sharedUser).length) {
-    //       if (this.$store.state.sharedUser.id === JSON.parse(localStorage.getItem("token")).id) {
-    //         console.log("this is you man");
-    //       } else {
-    //         console.log("This is a diff user")
-
-    //         try { 
-    //           let user = await api.getUser(this.$store.state.sharedUser.id, this);
-
-    //           // TODO: No need to store other user in vuex store, only need id in there
-    //           this.$store.state.sharedUser.profile = user.body.profile;
-    //           this.$store.state.sharedUser.data = { artists:[], tracks:[] }
-
-    //           for (let key in user.body.data) {
-    //             user.body.data[key].forEach(item=> {
-    //               if (key === "artists") {
-    //                 this.$store.state.sharedUser.data.artists.push(helper.decompressData(item))
-    //               } else {
-    //                 this.$store.state.sharedUser.data.tracks.push(helper.decompressData(item))
-    //               }
-    //             })
-    //           }
-    //           this.sharedUser = this.$store.state.sharedUser;
-    //           console.log("sharedUser", this.sharedUser);
-    //           this.compareData = true;
-    //           console.log(this.$store.state.sharedUser);
-    //         } catch(e) {
-    //           if (e) {
-    //             if (e.status === 401) {
-    //               console.log("You do not have permission to view this");
-    //             }
-    //             if (e.status === 404) {
-    //               console.log("This user does not exist");
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    
-
-    //     if (!this.$store.state.dataCached) {
-    //       console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")));
-    //       let id = JSON.parse(localStorage.getItem("token")).id;
-    //       let userData = await api.getCurrentUser(id, this);
-
-    //       sessionStorage.setItem("data", JSON.stringify(userData.body.data));
-    //       helper.setState(this);
-    //       console.log("Data wasn't cached, but we got it from db");
-    //     }
-
-    //     let profile = JSON.parse(localStorage.getItem("token"));
-    //     this.display_name = profile.display_name;
-    //     this.user_id = profile.id;
-    //     this.profile_image = profile.profile_image;
-    //     this.shareable_link = `${process.env.VUE_APP_FRONTEND_URL}/user/${this.user_id}`
-    //     let dataArr = JSON.parse(sessionStorage.getItem("data"));
-        
-    //     for (let key in dataArr) {
-    //       dataArr[key].forEach((item)=> {
-    //         if (key === "artists") {
-    //           this.listening_data.artists.push(helper.decompressData(item))
-    //         } else {
-    //           this.listening_data.tracks.push(helper.decompressData(item));
-    //         }
-    //       })
-    //     }
-    //     console.log(this.listening_data);
-        
-    //   }
-    //   helper.printState(this);
-    // }
-
-    // updateState().then().catch(e=> {
-    //   console.log(e);
-    // });
 
   },
   mounted() {
@@ -678,14 +491,24 @@ export default {
       if (this.$store.state.loggedIn) {
         console.log("Already Logged In: ", JSON.parse(localStorage.getItem("token")));
         
-        if (Object.keys(this.$store.state.sharedUser).length) {
-          if (this.$store.state.sharedUser.id === JSON.parse(localStorage.getItem("token")).id) {
+        if (Object.keys(this.$store.state.sharedUser).length || sessionStorage.getItem("sharedUser")) {
+          this.sharedUserExists = true;
+
+          let sharedUserId;
+          if (this.$store.state.sharedUser.id) {
+            sharedUserId = this.$store.sharedUser.id;
+            
+          } else {
+            sharedUserId = sessionStorage.getItem("sharedUser");
+          }
+
+          if (sharedUserId === JSON.parse(localStorage.getItem("token")).id) {
             console.log("this is you man");
           } else {
             console.log("This is a diff user")
 
             try { 
-              let user = await api.getUser(this.$store.state.sharedUser.id, this);
+              let user = await api.getUser(sharedUserId, this);
 
               // TODO: No need to store other user in vuex store, only need id in there
               this.$store.state.sharedUser.profile = user.body.profile;

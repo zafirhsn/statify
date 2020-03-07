@@ -4,6 +4,8 @@
 
     <v-col align="center">
 
+      <v-switch inset color="#1DB954" label="Compare Data" v-model="compareData" class="label-compare mb-n6" @click="compare()" v-if="sharedUserExists" ></v-switch>
+
       <v-switch inset color="#1DB954" label="Share Link" messages="Anyone with this link can view your data" v-model="sharing" class="label" @click="share()">Share</v-switch>
 
       <v-fade-transition>
@@ -25,12 +27,16 @@
   export default {
     props: {
       shareable_link: String,
-      sharing: Boolean
+      sharing: Boolean,
+      sharedUserExists: Boolean,
+      compareData: Boolean
     },
     methods: {
       share() {
         this.$emit("updateSharing", this.sharing);
-
+      },
+      compare() {
+        this.$emit("updateCompare", this.compareData);
       },
       copyLink() {
         if (this.sharing) {
@@ -46,5 +52,8 @@
 <style scoped lang="scss">
   .label {
     max-width: 150px;
+  }
+  .label-compare {
+    max-width: 200px
   }
 </style> 

@@ -83,6 +83,7 @@ import helper from '../services/helper'
     created() {
       console.log("====TESTING ENV VARS===")
       console.log(this.backendURL);
+      console.log(this.$store.state.sharedUser);
     }
   }
   

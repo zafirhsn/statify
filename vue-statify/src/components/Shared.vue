@@ -4,7 +4,7 @@
     <!-- Conditionally render button if user is not logged in -->
     <v-app-bar fixed elevate-on-scroll height="80" color="white">
       <v-spacer></v-spacer>
-      <v-btn rounded color="#1DB954" class="white--text"><img src="../assets//Spotify_Icon_RGB_White.png">Connect to Spotify</v-btn>
+      <v-btn rounded color="#1DB954" class="white--text" @click="login()"><img src="../assets//Spotify_Icon_RGB_White.png">Connect to Spotify</v-btn>
     </v-app-bar>
 
     <v-row class="mt-12">
@@ -47,7 +47,7 @@
     <v-row>
       <v-col>
 
-        
+
         <h2 align="start" class="display-1 mb-7">{{display_name}}'s Top Artists From           
           <span v-if="Number(artistTimeFrame)===0">the Last Month</span>
           <span v-if="Number(artistTimeFrame)===1">the Last 6 Months</span>
@@ -63,7 +63,7 @@
           <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
         </v-radio-group>
 
-        <top-lists :data="listening_data" listType="artists">
+        <top-lists :data="listening_data" listType="artists" :timeFrame="artistTimeFrame">
         </top-lists>
       </v-col>
     </v-row>
@@ -72,8 +72,21 @@
 
     <v-row>
       <v-col>
-        <h2 align="start" class="display-1 mb-7">{{display_name}}'s Top Tracks From the Last Month</h2>
-        <top-lists :data="listening_data" listType="tracks">
+        <h2 align="start" class="display-1 mb-7">{{display_name}}'s Top Tracks From           
+          <span v-if="Number(trackTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(trackTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(trackTimeFrame)===2">All Time</span>
+        </h2>
+
+        <v-radio-group v-model="trackTimeFrame" row mandatory>
+  
+          <!-- TODO: Change hover color to be spotify green -->
+          <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
+          <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
+          <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
+        </v-radio-group>
+
+        <top-lists :data="listening_data" listType="tracks" :timeFrame="trackTimeFrame">
         </top-lists>
       </v-col>
     </v-row>
@@ -132,7 +145,15 @@ import _TopLists from './_TopLists.vue'
       'top-lists': _TopLists
     },
     methods: {
-
+      authorizeUser() {
+        let obj = helper.generateAuthorizationString();
+        localStorage.setItem("state", obj.state);
+        window.location = obj.url;
+      },   
+      login() {
+        sessionStorage.setItem("sharedUser", this.$route.params.id);
+        this.authorizeUser();
+      }
     },
     beforeCreate() {
       console.log("===SHARED===");
