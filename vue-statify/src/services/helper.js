@@ -32,7 +32,7 @@ export default {
     querystring.stringify({
       client_id: "d4557495633b429a85292698a89e5978",
       response_type: "token",
-      redirect_uri: "http://localhost:8080/dashboard",
+      redirect_uri: `${process.env.VUE_APP_FRONTEND_URL}/dashboard`,
       state: state,
       scope: "user-read-private user-read-email user-top-read playlist-modify-public playlist-modify-private"
     });
