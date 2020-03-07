@@ -1,9 +1,15 @@
 <template>
+
+
   <v-row>
+
+    <!-- Each list is contained in a column. Each piece of data is a list with just one list item. -->
     <v-col v-for="(item, index) of userData[Number(timeFrameCaught)].items" :key="index" :sm="numColSm" :md="numColMd" :lg="numColLg">
+
+      
       <v-list>
         <v-list-item>
-          <v-list-item-avatar tile size="56" class="custom-avatar">
+          <v-list-item-avatar tile size="64" class="custom-avatar">
             <v-img :src="item.images"></v-img>
           </v-list-item-avatar>
 
@@ -15,8 +21,12 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+
     </v-col>
+
   </v-row>
+
+
 </template>
 
 <script>
@@ -42,8 +52,7 @@
         if (this.listType === "artists") {
           return this.data.artists;
         } else if (this.listType === "tracks") {
-          let filteredData = { 
-            profile: this.data.profile,
+          let filteredData = {
             artists: this.data.artists,
             tracks: []  
           }
@@ -54,7 +63,7 @@
             }
             filteredData.tracks.push({items: temp});
           }
-          console.log(filteredData)
+          console.log(filteredData);
           return filteredData.tracks;
           }
         return this.data.artists;
@@ -99,12 +108,5 @@
 <style scoped lang="scss">
   .custom-avatar {
     border-radius: 4px;
-
-    @media screen and (min-width: 700px) {
-      min-width: 70px;
-    }
-  }
-  h2 {
-    text-decoration: underline;
   }
 </style>

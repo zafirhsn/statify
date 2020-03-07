@@ -43,13 +43,12 @@ export default {
   },
 
   async saveUser(data, comp) {
-    return comp.$http.post("http://localhost:3000/storeuser", data);
-    // console.log("Successfully stored user's profile in database")
+    return comp.$http.post(`${process.env.VUE_APP_BACKEND_URL}/storeuser`, data);
   },
   async getCurrentUser(id, comp) {
-    return comp.$http.get(`http://localhost:3000/me/${id}`)
+    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/me/${id}`)
   },
   async getUser(id, comp) {
-    return comp.$http.get(`http://localhost:3000/getuser/${id}`)
+    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/getuser/${id}`)
   }
 }
