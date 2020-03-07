@@ -7,4 +7,5 @@ export const routes = [
   { path: '/', name: 'login', component: Login },
   { path: '/user/:id', name: 'sharedData', component: SharedData },
   { path: '/dashboard', name: 'dashboard', component: Dashboard },
+  { path: '*', component: Login }
 ]

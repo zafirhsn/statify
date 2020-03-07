@@ -26,7 +26,7 @@
 
         <v-row class="mb-5">
           <v-col>
-            <h1 class="display-1">At a Glance for {{display_name}}</h1>
+            <h2 class="display-1">At a Glance for {{display_name}}</h2>
           </v-col>
         </v-row>
         <v-row>  
@@ -46,7 +46,23 @@
 
     <v-row>
       <v-col>
-        <h2 align="start" class="display-1 mb-7">{{display_name}}'s Top Artists From the Last Month</h2>
+
+        
+        <h2 align="start" class="display-1 mb-7">{{display_name}}'s Top Artists From           
+          <span v-if="Number(artistTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(artistTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(artistTimeFrame)===2">All Time</span>
+        </h2>
+
+        <!-- List Radio Group for time frame -->
+        <v-radio-group v-model="artistTimeFrame" row mandatory>
+  
+          <!-- TODO: Change hover color to be spotify green -->
+          <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
+          <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
+          <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
+        </v-radio-group>
+
         <top-lists :data="listening_data" listType="artists">
         </top-lists>
       </v-col>
@@ -85,7 +101,9 @@ import _TopLists from './_TopLists.vue'
         error: false,
         errMsg: "",
         dataArrived: false,
-        compareData: false
+        compareData: false,
+        artistTimeFrame: 0,
+        trackTimeFrame: 0,
       }
     },
     computed: {

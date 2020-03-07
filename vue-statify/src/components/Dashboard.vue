@@ -192,7 +192,7 @@
           <span v-if="Number(artistTimeFrame)===2">All Time</span>
         </h2>
 
-        <top-lists :data="sharedUser.data" :compareData="compareData" listType="artists">
+        <top-lists :data="sharedUser.data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame">
         </top-lists>
 
 
@@ -236,7 +236,7 @@
         </h2>
 
         <!-- TODO: Change hardcode of sharedUser so timeFrame can work. Add two more pieces of data to the sharedUser data object -->
-        <top-lists :data="sharedUser.data" :compareData="compareData" listType="tracks">
+        <top-lists :data="sharedUser.data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame">
         </top-lists>
 
       </v-col>
@@ -265,6 +265,7 @@
 
     </v-row>
 
+    <!-- ! POPULARITY / AUDIO FEATURES CHART -->
     <v-row>
       <v-col>
         <!-- TODO: Render popularity chart of artists -->
@@ -360,6 +361,7 @@ export default {
       this.$router.push('/');
     }
   },
+  // TODO: Add before route enter logic
   beforeCreate() {
     // Set the state of the application based on browser cache
     console.log("===DASHBOARD===")
@@ -768,7 +770,7 @@ export default {
     });
   },
   beforeUpdate() {
-    var words = ["Hello", "world", "normally", "you", "want", "more", "words", "than", "this"]
+    var words = ["Hello", "world", "normally", "you", "want", "more", "words", "than", "this", "Hello", "world", "normally", "you", "want", "more", "words", "than", "this", "Hello", "world", "normally", "you", "want", "more", "words", "than", "this", "Hello", "world", "normally", "you", "want", "more", "words", "than", "this"]
         .map(function(d) {
           return {text: d, size: 10 + Math.random() * 90};
         });
@@ -777,12 +779,12 @@ export default {
           console.log(JSON.stringify(words)); 
         } 
 
-    cloud().size([300, 300])
-      .canvas(function() {return document.getElementById("wordcloud")})
+    cloud().size([300,300])
+      .canvas(function() { return document.getElementById("wordcloud")})
       .words(words)
       .padding(5)
       .rotate(function() { return ~~(Math.random() * 2) * 90; })
-      .timeInterval(200)
+      .timeInterval(50)
       .font("Impact")
       .fontSize(function(d) { return d.size; })
       .on("end", end)
@@ -819,7 +821,10 @@ export default {
   label[for="menuShareSwitch"] {
     margin-left: 5px;
   }
-
+  canvas {
+    align-content: center;
+    justify-content: center;
+  }
 
 /*   .container {
     height: 100%;
