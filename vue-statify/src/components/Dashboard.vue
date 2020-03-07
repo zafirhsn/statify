@@ -496,7 +496,7 @@ export default {
 
           let sharedUserId;
           if (this.$store.state.sharedUser.id) {
-            sharedUserId = this.$store.sharedUser.id;
+            sharedUserId = this.$store.state.sharedUser.id;
             
           } else {
             sharedUserId = sessionStorage.getItem("sharedUser");
