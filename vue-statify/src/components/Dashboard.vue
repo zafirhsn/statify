@@ -132,9 +132,9 @@
 
         <v-row>
           <!-- TODO: Do NOT hardcode this, use a computed property -->
-          <top-item :images="sharedUser.data.artists[0].items[0].images" type="artist" :name="sharedUser.data.artists[0].items[0].name"
+          <top-item :images="sharedUser.data.artists[2].items[0].images" type="artist" :name="sharedUser.data.artists[2].items[0].name"
           ></top-item>
-          <top-item :images="sharedUser.data.tracks[0].items[0].images" type="track" :name="sharedUser.data.tracks[0].items[0].name"></top-item>
+          <top-item :images="sharedUser.data.tracks[2].items[0].images" type="track" :name="sharedUser.data.tracks[2].items[0].name"></top-item>
           <top-item type="genre" :name="topGenre"></top-item>
         </v-row>
 
@@ -597,9 +597,9 @@ export default {
           return {text: d, size: 10 + Math.random() * 90};
         });
 
-        let end = words => { 
-          console.log(JSON.stringify(words)); 
-        } 
+        // let end = words => { 
+        //   console.log(JSON.stringify(words));
+        // } 
 
     cloud().size([300,300])
       .canvas(function() { return document.getElementById("wordcloud")})
@@ -609,7 +609,6 @@ export default {
       .timeInterval(50)
       .font("Impact")
       .fontSize(function(d) { return d.size; })
-      .on("end", end)
       .start();
 
   }

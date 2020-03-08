@@ -64,26 +64,26 @@ import helper from '../services/helper'
     },
     beforeCreate() {
       helper.setState(this);
-      console.log("===LOGIN===");
-      console.log("Data cached: " , this.$store.state.dataCached);
-      console.log("Logged In: ", this.$store.state.loggedIn);
-      console.log("Token Expired: ", this.$store.state.tokenExpired);
+      //console.log("===LOGIN===");
+      //console.log("Data cached: " , this.$store.state.dataCached);
+      //console.log("Logged In: ", this.$store.state.loggedIn);
+      //console.log("Token Expired: ", this.$store.state.tokenExpired);
 
       if (!this.$store.state.loggedIn && localStorage.getItem("token")) {
-        console.log("The user is not logged in but an old token remains in localStorage: ", JSON.parse(localStorage.getItem("token")));
+        //console.log("The user is not logged in but an old token remains in localStorage: ", JSON.parse(localStorage.getItem("token")));
         localStorage.removeItem("token");
         sessionStorage.removeItem("data");
         this.$store.state.dataCached = false;
       }
       else if (this.$store.state.loggedIn) {
-        console.log("The user is logged in: ", JSON.parse(localStorage.getItem("token")));
+        //console.log("The user is logged in: ", JSON.parse(localStorage.getItem("token")));
         this.$router.push("/dashboard");
       }
     },
     created() {
-      console.log("====TESTING ENV VARS===")
-      console.log(this.backendURL);
-      console.log(this.$store.state.sharedUser);
+      //console.log("====TESTING ENV VARS===")
+      //console.log(this.backendURL);
+      //console.log(this.$store.state.sharedUser);
     }
   }
   

@@ -41,7 +41,7 @@
       copyLink() {
         if (this.sharing) {
           navigator.clipboard.writeText(this.shareable_link).then(()=> {
-            console.log("copying successfull");
+            //console.log("copying successfull");
           })
         }
       }

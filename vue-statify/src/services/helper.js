@@ -78,9 +78,9 @@ export default {
     }
   },
   printState(comp) {
-    console.log("Data cached: ", comp.$store.state.dataCached);
-    console.log("Logged In: ", comp.$store.state.loggedIn);
-    console.log("Token Expired: ", comp.$store.state.tokenExpired);
+    //console.log("Data cached: ", comp.$store.state.dataCached);
+    //console.log("Logged In: ", comp.$store.state.loggedIn);
+    //console.log("Token Expired: ", comp.$store.state.tokenExpired);
   },
   cleanTrackData(data) {
     let total = data.body.total;

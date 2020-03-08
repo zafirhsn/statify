@@ -10,7 +10,7 @@ export default {
         'Authorization': `Bearer ${access_token}`
       }
     });
-    console.log("Successfully got user's profile from Spotify");
+    //console.log("Successfully got user's profile from Spotify");
     let display_name = profile.body.display_name;
     let email = profile.body.email;
     let id = profile.body.id;
@@ -38,7 +38,7 @@ export default {
       comp.$http.get("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50", options),
       comp.$http.get("https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=50", options),
       comp.$http.get("https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50", options)])
-    console.log("Successfully recieved listening data from Spotify");
+    //console.log("Successfully recieved listening data from Spotify");
     return listeningData;
   },
 

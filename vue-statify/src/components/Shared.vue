@@ -30,10 +30,10 @@
           </v-col>
         </v-row>
         <v-row>  
-          <top-item :images="listening_data.artists[0].items[0].images" type="artist" :name="listening_data.artists[0].items[0].name"
+          <top-item :images="listening_data.artists[2].items[0].images" type="artist" :name="listening_data.artists[2].items[0].name"
           ></top-item>
 
-          <top-item :images="listening_data.tracks[0].items[0].images" type="track" :name="listening_data.tracks[0].items[0].name"></top-item>
+          <top-item :images="listening_data.tracks[2].items[0].images" type="track" :name="listening_data.tracks[2].items[0].name"></top-item>
 
           <top-item type="genre" :name="topGenre"></top-item>
         </v-row>
@@ -156,11 +156,11 @@ import _TopLists from './_TopLists.vue'
       }
     },
     beforeCreate() {
-      console.log("===SHARED===");
+      //console.log("===SHARED===");
       helper.setState(this);
       helper.printState(this);
 
-      // console.log(typeof this.$route.params.id);
+      // //console.log(typeof this.$route.params.id);
       this.$store.state.sharedUser = { id : this.$route.params.id };
       if (this.$store.state.loggedIn) {
         this.$router.push('/dashboard');
@@ -168,7 +168,7 @@ import _TopLists from './_TopLists.vue'
     },
     created() {
       api.getUser(this.$store.state.sharedUser.id, this).then(res=> {
-        // console.log(res);
+        // //console.log(res);
         this.display_name = res.body.profile.display_name;
         this.user_id = res.body.profile.id;
         this.profile_image = res.body.profile.images[0].url;
@@ -183,7 +183,7 @@ import _TopLists from './_TopLists.vue'
           
           })
         }
-        console.log(this.listening_data);
+        //console.log(this.listening_data);
       }).catch(e=> {
         if (e && e.status === 401) {
           this.errMsg = "You do not have permission to view this data";

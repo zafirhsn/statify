@@ -63,7 +63,7 @@
             }
             filteredData.tracks.push({items: temp});
           }
-          console.log(filteredData);
+          //console.log(filteredData);
           return filteredData.tracks;
           }
         return this.data.artists;
