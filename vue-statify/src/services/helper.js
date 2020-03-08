@@ -78,6 +78,7 @@ export default {
     }
   },
   printState(comp) {
+    return comp;
     //console.log("Data cached: ", comp.$store.state.dataCached);
     //console.log("Logged In: ", comp.$store.state.loggedIn);
     //console.log("Token Expired: ", comp.$store.state.tokenExpired);
