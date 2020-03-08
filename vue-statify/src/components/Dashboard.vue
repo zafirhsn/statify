@@ -588,7 +588,7 @@ export default {
     }
 
     updateState().then().catch(e=> {
-      //console.log(e);
+      console.log(e);
     });
   },
   beforeUpdate() {
@@ -598,7 +598,7 @@ export default {
         });
 
         let end = words => { 
-          //console.log(JSON.stringify(words)); 
+          console.log(JSON.stringify(words)); 
         } 
 
     cloud().size([300,300])
