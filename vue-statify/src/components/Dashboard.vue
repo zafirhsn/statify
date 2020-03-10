@@ -69,8 +69,13 @@
     <!-- ^ PROFILE PIC-->
     <v-row class="mt-12">
       <v-col class="mt-12" align="center">
-        <img class="welcome-image" :src="profile_image">
-        <v-skeleton-loader tile type="image" v-if="!profile_image"></v-skeleton-loader>
+
+        <v-fade-transition>
+          <v-skeleton-loader tile height="150" width="150" type="image" v-if="!dataArrived">
+        </v-skeleton-loader>
+
+        <img v-else class="welcome-image" :src="profile_image">
+      </v-fade-transition>
       </v-col>
       <v-col  class="mt-12" align="center" v-if="compareData">
         <img class="welcome-image" :src="sharedUser.profile.images[0].url" v-if="compareData">
@@ -249,18 +254,34 @@
     <!-- ^ TOP GENRE -->
     <v-row>
       <v-col>
-        <h2 class="display-1 mb-12">Your Top Genres</h2>
-        <canvas id="wordcloud" ref="wordcloud" width="600" height="300">
+        <h2 :align="align" class="display-1 mb-7">Your Top Genres from
+          <span v-if="Number(genreTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(genreTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(genreTimeFrame)===2">All Time</span>
+        </h2>
 
-        </canvas>
+        <v-radio-group v-model="genreTimeFrame" row mandatory>
+          <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
+          <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
+          <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
+        </v-radio-group>
+        
+        <top-genres :data="listening_data.artists" :compareData="compareData" listType="genres" :timeFrame=genreTimeFrame>
+
+        </top-genres>
       </v-col>
+
+      <v-divider vertical v-if="compareData"></v-divider>
 
       <!-- TODO: conditionally render shared user word cloud -->
       <v-col v-if="compareData">
-        <h2 class="display-1 mb-12">{{sharedUser.profile.display_name}}'s Top Genres</h2>
-        <div id="wordcloud2" ref="wordcloud2">
+        <h2 :align="align" class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top Genres from
+          <span v-if="Number(genreTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(genreTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(genreTimeFrame)===2">All Time</span>
+        </h2>
 
-        </div>
+        <top-genres :data="sharedUser.data.artists" :compareData="compareData" listType="genres" :timeFrame=genreTimeFrame></top-genres>
       </v-col>
 
     </v-row>
@@ -286,10 +307,11 @@
 import api from '../services/api/api';
 import helper from '../services/helper'
 // import wordcloud from '../../node_modules/wordcloud';
-import cloud from '../../node_modules/d3-cloud';
+// import cloud from '../../node_modules/d3-cloud';
 import _TopItem from './_TopItem.vue';
 import _ShareLink from './_ShareLink.vue';
 import _TopLists from './_TopLists.vue';
+import _TopGenres from './_TopGenres.vue';
 
 export default {
   data() {
@@ -308,19 +330,27 @@ export default {
       compareData: false,
       artistTimeFrame: 0,
       trackTimeFrame: 0,
+      genreTimeFrame: 0,
       vuetify: {
         closeOnContentClick: false
       },
+      dataArrived: false
     }
   },
   components: {
     'top-item': _TopItem,
     'share-link': _ShareLink,
-    'top-lists': _TopLists
+    'top-lists': _TopLists,
+    'top-genres': _TopGenres
   },
   watch: {
     sharing() {
-      //console.log(this.sharing);
+      // console.log(this.sharing);
+      api.setShare({ id: this.user_id, share: this.sharing}, this).then((res)=> {
+        return res
+      }).catch(e=> {
+        return e;
+      })
     },
     radioGroup() {
       //console.log(this.radioGroup)
@@ -374,9 +404,6 @@ export default {
     //console.log("sharedUser", this.$store.state.sharedUser);
   },
   created() {
-
-  },
-  mounted() {
     const updateState = async () => {
       if (!this.$store.state.loggedIn) {
         //console.log("Not logged in: ", localStorage.getItem("token"));
@@ -466,6 +493,8 @@ export default {
           this.display_name =  profileData.display_name;
           this.user_id =  profileData.id;
           this.shareable_link = `${process.env.VUE_APP_FRONTEND_URL}/user/${this.user_id}`;
+          let sharing = await api.getShare(this.user_id, this);
+          this.sharing = sharing.body;
           if (profileData.images.length) {
             this.profile_image = profileData.images[0].url;
           } else {
@@ -556,7 +585,9 @@ export default {
         this.profile_image = profile.profile_image;
         this.shareable_link = `${process.env.VUE_APP_FRONTEND_URL}/user/${this.user_id}`
         let dataArr = JSON.parse(sessionStorage.getItem("data"));
-        
+        let sharing = await api.getShare(this.user_id, this);
+        this.sharing = sharing.body;
+        // console.log(this.sharing.body);
         for (let key in dataArr) {
           dataArr[key].forEach((item)=> {
             if (key === "artists") {
@@ -566,50 +597,19 @@ export default {
             }
           })
         }
-
-        let topGenres = {};
-        for (let genre of this.listening_data.artists[0].genres) {
-          if (topGenres[genre]) {
-            topGenres[genre]++;
-          } else {
-            topGenres[genre] = 1;
-          }
-        }
-        //console.log(this.$refs);
-        let wordcloudlist = [];
-        for (let key in topGenres) {
-          wordcloudlist.push([key, topGenres[key]]);
-        }
-
-      //console.log(this.listening_data);
         
       }
       helper.printState(this);
     }
 
-    updateState().then().catch(e=> {
+    updateState().then(()=> {
+      this.dataArrived = true;
+    }).catch(e=> {
+      
       console.log(e);
     });
   },
-  beforeUpdate() {
-    var words = ["Hello", "world", "normally", "you", "want", "more", "words", "than", "this", "Hello", "world", "normally", "you", "want", "more", "words", "than", "this", "Hello", "world", "normally", "you", "want", "more", "words", "than", "this", "Hello", "world", "normally", "you", "want", "more", "words", "than", "this"]
-        .map(function(d) {
-          return {text: d, size: 10 + Math.random() * 90};
-        });
-
-        // let end = words => { 
-        //   console.log(JSON.stringify(words));
-        // } 
-
-    cloud().size([300,300])
-      .canvas(function() { return document.getElementById("wordcloud")})
-      .words(words)
-      .padding(5)
-      .rotate(function() { return ~~(Math.random() * 2) * 90; })
-      .timeInterval(50)
-      .font("Impact")
-      .fontSize(function(d) { return d.size; })
-      .start();
+  mounted() {
 
   }
 }
