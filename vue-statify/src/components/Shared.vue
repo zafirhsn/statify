@@ -144,7 +144,7 @@ import _TopGenres from './_TopGenres.vue';
     computed: {
       topGenre() {
       let topGenres = {};
-        for (let genre of this.listening_data.artists[0].genres) {
+        for (let genre of this.listening_data.artists[2].genres) {
           if (topGenres[genre]) {
             topGenres[genre]++;
           } else {
