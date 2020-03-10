@@ -46,9 +46,15 @@ export default {
     return comp.$http.post(`${process.env.VUE_APP_BACKEND_URL}/storeuser`, data);
   },
   async getCurrentUser(id, comp) {
-    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/me/${id}`)
+    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/me/${id}`);
   },
   async getUser(id, comp) {
-    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/getuser/${id}`)
+    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/getuser/${id}`);
+  },
+  async setShare(data, comp) {
+    return comp.$http.post(`${process.env.VUE_APP_BACKEND_URL}/setshare`, data);
+  },
+  async getShare(id, comp) {
+    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/getshare/${id}`);
   }
 }

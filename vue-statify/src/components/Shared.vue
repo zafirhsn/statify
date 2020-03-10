@@ -91,6 +91,26 @@
       </v-col>
     </v-row>
 
+    <v-row>
+      <v-col>
+        <h2 :align="align" class="display-1 mb-7">{{display_name}}'s Top Genres from
+          <span v-if="Number(genreTimeFrame)===0">the Last Month</span>
+          <span v-if="Number(genreTimeFrame)===1">the Last 6 Months</span>
+          <span v-if="Number(genreTimeFrame)===2">All Time</span>
+        </h2>
+
+        <v-radio-group v-model="genreTimeFrame" row mandatory>
+          <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
+          <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
+          <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
+        </v-radio-group>
+        
+        <top-genres :data="listening_data.artists" :compareData="compareData" listType="genres" :timeFrame=genreTimeFrame>
+
+        </top-genres>
+      </v-col>
+    </v-row>
+
 
   </v-container>
 </template>
@@ -100,6 +120,7 @@ import helper from '../services/helper';
 import api from '../services/api/api'
 import _TopItem from './_TopItem.vue';
 import _TopLists from './_TopLists.vue'
+import _TopGenres from './_TopGenres.vue';
 
   export default {
     data() {
@@ -117,6 +138,7 @@ import _TopLists from './_TopLists.vue'
         compareData: false,
         artistTimeFrame: 0,
         trackTimeFrame: 0,
+        genreTimeFrame: 0
       }
     },
     computed: {
@@ -142,7 +164,8 @@ import _TopLists from './_TopLists.vue'
     },
     components: {
       'top-item': _TopItem,
-      'top-lists': _TopLists
+      'top-lists': _TopLists,
+      'top-genres': _TopGenres
     },
     methods: {
       authorizeUser() {
