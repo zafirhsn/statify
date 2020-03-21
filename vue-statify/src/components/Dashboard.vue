@@ -464,7 +464,9 @@ export default {
           })
           //console.log("THIS IS THE LISTENING DATA", listeningData);
             
-          
+          // GET TOKEN FROM BACKEND HERE
+          let token = await this.$http.post(`${process.env.VUE_APP_BACKEND_URL}/token`, {id: profileData.id, display_name: profileData.display_name})
+          console.log(token);
 
           // Save the data in the db
           try { 
@@ -519,6 +521,8 @@ export default {
       }
       if (this.$store.state.loggedIn) {
         //console.log("Already Logged In: ", JSON.parse(localStorage.getItem("token")));
+
+        //CHECK IF CURRENT TOKEN IS EXPIRED, IF SO, REFRESH
         
         if (Object.keys(this.$store.state.sharedUser).length || sessionStorage.getItem("sharedUser")) {
 
