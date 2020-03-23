@@ -121,7 +121,7 @@
           <top-item :images="listening_data.artists[2].items[0].images" type="artist" :name="listening_data.artists[2].items[0].name"
           ></top-item>
           <top-item :images="listening_data.tracks[2].items[0].images" type="track" :name="listening_data.tracks[2].items[0].name"></top-item>
-          <top-item type="genre" :name="topGenre"></top-item>
+          <top-item type="genre" :name="topUserGenre"></top-item>
         </v-row>
 
       </v-col>
@@ -140,7 +140,7 @@
           <top-item :images="sharedUser.data.artists[2].items[0].images" type="artist" :name="sharedUser.data.artists[2].items[0].name"
           ></top-item>
           <top-item :images="sharedUser.data.tracks[2].items[0].images" type="track" :name="sharedUser.data.tracks[2].items[0].name"></top-item>
-          <top-item type="genre" :name="topGenre"></top-item>
+          <top-item type="genre" :name="topSharedUserGenre"></top-item>
         </v-row>
 
       </v-col>
@@ -170,16 +170,9 @@
         </v-radio-group>
 
         <!-- // List -->
-        <top-lists :data="listening_data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame">
+        <top-lists :data="listening_data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame" :similarities="artistSimilarities">
         </top-lists>
-
-        <v-row v-if="!listening_data">
-          <v-col v-for="(index) in 10" :key="index">
-            <v-skeleton-loader tile type="v-list-item-avatar"></v-skeleton-loader>
-          </v-col>
-        </v-row>
   
-
       </v-col>
 
 
@@ -195,7 +188,7 @@
           <span v-if="Number(artistTimeFrame)===2">All Time</span>
         </h2>
 
-        <top-lists :data="sharedUser.data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame">
+        <top-lists :data="sharedUser.data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame" :similarities="artistSimilarities">
         </top-lists>
 
 
@@ -203,6 +196,10 @@
 
     </v-row>
 
+    <!-- //^ DIFFERENCES BETWEEN ARTIST DATA  -->
+    <v-row v-if="compareData">
+      <differences :sharedUser="sharedUser" :user="listening_data" :timeFrame="artistTimeFrame" type="artists"></differences>
+    </v-row>
 
     <v-divider class="mb-3"></v-divider>
 
@@ -223,7 +220,7 @@
           <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
         </v-radio-group>
 
-        <top-lists :data="listening_data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame">
+        <top-lists :data="listening_data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame" :similarities="trackSimilarities">
         </top-lists>
 
       </v-col>
@@ -238,11 +235,16 @@
           <span v-if="Number(trackTimeFrame)===2">All Time</span>
         </h2>
 
-        <top-lists :data="sharedUser.data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame">
+        <top-lists :data="sharedUser.data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame" :similarities="trackSimilarities">
         </top-lists>
 
       </v-col>
 
+    </v-row>
+
+    <!-- //^ DIFFERENCES BETWEEN TRACK DATA -->
+    <v-row v-if="compareData">
+      <differences :sharedUser="sharedUser" :user="listening_data" :timeFrame="trackTimeFrame" type="tracks"></differences>
     </v-row>
 
 
@@ -263,7 +265,7 @@
           <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
         </v-radio-group>
         
-        <top-genres :data="listening_data.artists" :compareData="compareData" listType="genres" :timeFrame=genreTimeFrame>
+        <top-genres :data="listening_data.artists" :compareData="compareData" listType="genres" :timeFrame="genreTimeFrame" :similarities="genreSimilarities">
 
         </top-genres>
       </v-col>
@@ -278,9 +280,14 @@
           <span v-if="Number(genreTimeFrame)===2">All Time</span>
         </h2>
 
-        <top-genres :data="sharedUser.data.artists" :compareData="compareData" listType="genres" :timeFrame=genreTimeFrame></top-genres>
+        <top-genres :data="sharedUser.data.artists" :compareData="compareData" listType="genres" :timeFrame="genreTimeFrame" :similarities="genreSimilarities"></top-genres>
       </v-col>
 
+    </v-row>
+
+    <!-- //^ DIFFERENCES IN TOP GENRES -->
+    <v-row v-if="compareData">
+      <differences :sharedUser="sharedUser" :user="listening_data" :timeFrame="genreTimeFrame" type="genres"></differences>
     </v-row>
 
     <!-- // ! POPULARITY / AUDIO FEATURES CHART -->
@@ -309,6 +316,7 @@ import _TopItem from './_TopItem.vue';
 import _ShareLink from './_ShareLink.vue';
 import _TopLists from './_TopLists.vue';
 import _TopGenres from './_TopGenres.vue';
+import Differences from './Differences.vue'
 
 export default {
   data() {
@@ -338,7 +346,8 @@ export default {
     'top-item': _TopItem,
     'share-link': _ShareLink,
     'top-lists': _TopLists,
-    'top-genres': _TopGenres
+    'top-genres': _TopGenres,
+    'differences': Differences
   },
   watch: {
     sharing() {
@@ -372,7 +381,7 @@ export default {
         }
         return "start"
     },
-    topGenre() {
+    topUserGenre() {
       let topGenres = {};
       // HARDCODE
       for (let genre of this.listening_data.artists[2].genres) {
@@ -391,9 +400,127 @@ export default {
         }
       }
       return maxKey;
+    },
+    topSharedUserGenre() {
+      let topGenres = {};
+      // HARDCODE
+      for (let genre of this.sharedUser.data.artists[2].genres) {
+        if (topGenres[genre]) {
+          topGenres[genre]++;
+        } else {
+          topGenres[genre] = 1;
+        }
+      }
+      let max = 0; 
+      let maxKey = "";
+      for (let key in topGenres) {
+        if (topGenres[key] > max) {
+          max = topGenres[key];
+          maxKey = key;
+        }
+      }
+      return maxKey;
+    },
+    artistSimilarities() {
+      let artistSim = {};
+      for (let artist of this.listening_data.artists[this.artistTimeFrame].items) {
+        if (!artistSim[artist.id]) {
+          artistSim[artist.id] = 1;
+        } else {
+          artistSim[artist.id]++;
+        }
+      }
+      for (let artist of this.sharedUser.data.artists[this.artistTimeFrame].items) {
+        if (artistSim[artist.id]) {
+          artistSim[artist.id]++;
+        }
+      }
+      return artistSim;
+    },
+    trackSimilarities() {
+      let trackSim = {};
+      let filteredUserTracks = this.listening_data.tracks[this.trackTimeFrame].items.slice(0,10);
+      let filteredSharedUserTracks = this.sharedUser.data.tracks[this.trackTimeFrame].items.slice(0,10);
+
+      for (let track of filteredUserTracks) {
+        if (!trackSim[track.id]) {
+          trackSim[track.id] = 1;
+        } else {
+          trackSim[track.id]++;
+        }
+      }
+      for (let track of filteredSharedUserTracks) {
+        if (trackSim[track.id]) {
+          trackSim[track.id]++;
+        }
+      }
+      return trackSim;
+    },
+    genreSimilarities() {
+      let genreSim = {};
+
+      let topUserGenres = {};
+      let topUserGenresArr = [];
+      for (let genre of this.listening_data.artists[Number(this.genreTimeFrame)].genres) {
+        if (topUserGenres[genre]) {
+          topUserGenres[genre]++;
+        } else {
+          topUserGenres[genre] = 1;
+        }
+      }
+      for (let genre in topUserGenres) {
+        let capitalizedGenre = this.capitalizeGenre(genre);
+        topUserGenresArr.push([capitalizedGenre, topUserGenres[genre]]);
+      }
+      topUserGenresArr.sort((a, b)=> {
+        return b[1] - a[1];
+      })
+      topUserGenresArr = topUserGenresArr.slice(0, 10);
+
+      let topSharedUserGenres = {};
+      let topSharedUserGenresArr = []
+
+      for (let genre of this.sharedUser.data.artists[Number(this.genreTimeFrame)].genres) {
+        if (topSharedUserGenres[genre]) {
+          topSharedUserGenres[genre]++;
+        } else {
+          topSharedUserGenres[genre] = 1;
+        }
+      }
+      for (let genre in topSharedUserGenres) {
+        let capitalizedGenre = this.capitalizeGenre(genre);
+        topSharedUserGenresArr.push([capitalizedGenre, topSharedUserGenres[genre]]);
+      }
+      topSharedUserGenresArr.sort((a, b)=> {
+        return b[1] - a[1];
+      })
+      topSharedUserGenresArr = topSharedUserGenresArr.slice(0, 10);
+
+      for (let genre of topUserGenresArr) {
+        if (!genreSim[genre[0]]) {
+          genreSim[genre[0]] = 1;
+        } else {
+          genreSim[genre[0]]++;
+        }
+      }
+
+      for (let genre of topSharedUserGenresArr) {
+        if (genreSim[genre[0]]) {
+          genreSim[genre[0]]++;
+        }
+      }
+      return genreSim;
     }
   },
   methods: {
+    capitalizeGenre(genre) {
+      let garr = genre.split(" ");
+      let garr2 = [];
+      for (let part of garr) {
+        garr2.push(part[0].toUpperCase() + part.substring(1, part.length))
+      }
+      return garr2.join(" ");
+    },
     logout() {
       sessionStorage.removeItem("data");
       sessionStorage.removeItem("sharedUser");
@@ -639,8 +766,22 @@ export default {
         if (!this.$store.state.dataCached) {
           //console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")));
           let token = localStorage.getItem("apitoken");
-          let userData = await api.getCurrentUser(token, this);
 
+          let userData;
+          try {
+            userData = await api.getCurrentUser(token, this);
+          } catch(e) {
+            if (e.status === 401) {
+              try {
+                let token = await api.getToken({id: JSON.parse(localStorage.getItem("user")).id, display_name: JSON.parse(localStorage.getItem("user")).display_name }, this);
+                localStorage.setItem("apitoken", token);
+
+                userData = await api.getCurrentUser(token, this);
+              } catch (e) {
+                // TODO: Deal with error involving getting token, maybe "application error message"
+              }
+            }
+          }
           sessionStorage.setItem("data", JSON.stringify(userData.body.data));
           helper.setState(this);
           //console.log("Data wasn't cached, but we got it from db");
@@ -652,7 +793,7 @@ export default {
         this.profile_image = profile.profile_image;
         this.shareable_link = `${process.env.VUE_APP_FRONTEND_URL}/user/${this.user_id}`
         let dataArr = JSON.parse(sessionStorage.getItem("data"));
-        // TODO: Protect sharing route
+
         let token = localStorage.getItem("apitoken");
         let sharing; 
         try {

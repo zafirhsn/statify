@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row class="ma-5">
       <v-col align="center">
-        <!-- TODO: Pick a better name -->
+        <!-- // TODO: Pick a better name -->
         <h1 class="display-4 font-weight-thin">Statify</h1>
         <p class="subtitle-1">Your music in numbers</p>
       </v-col>

@@ -54,6 +54,6 @@
       flex: none;
     }
     .headline {
-      text-decoration: underline;
+      text-decoration: none;
     }
 </style>
