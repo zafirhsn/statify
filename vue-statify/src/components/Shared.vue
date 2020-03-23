@@ -7,20 +7,21 @@
       <v-btn rounded color="#1DB954" class="white--text" @click="login()"><img src="../assets//Spotify_Icon_RGB_White.png">Connect to Spotify</v-btn>
     </v-app-bar>
 
+    <!-- //^ Profile Picture Here --> 
     <v-row class="mt-12">
       <v-col class="mt-12" align="center">
-        <!-- Profile Picture Here --> 
         <img class="welcome-image" :src="profile_image">
       </v-col>
     </v-row>
 
+    <!-- //^ Welcome message -->
     <v-row>
       <v-col align="center">
-        <!-- Welcome message -->
         <span class="display-3 font-weight-thin">{{display_name}}</span>
       </v-col>
     </v-row>
 
+    <!-- //^ At a Glance  -->
     <v-row>
       <v-col align="center">
 
@@ -43,7 +44,7 @@
 
     <v-divider class="mb-3"></v-divider>
 
-
+    <!-- //^ Top Artists  -->
     <v-row>
       <v-col>
 
@@ -56,8 +57,6 @@
 
         <!-- List Radio Group for time frame -->
         <v-radio-group v-model="artistTimeFrame" row mandatory>
-  
-          <!-- TODO: Change hover color to be spotify green -->
           <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
           <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
           <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
@@ -70,6 +69,7 @@
 
     <v-divider class="mb-3"></v-divider>
 
+    <!-- //^ Top Tracks -->
     <v-row>
       <v-col>
         <h2 align="start" class="display-1 mb-7">{{display_name}}'s Top Tracks From           
@@ -79,8 +79,6 @@
         </h2>
 
         <v-radio-group v-model="trackTimeFrame" row mandatory>
-  
-          <!-- TODO: Change hover color to be spotify green -->
           <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
           <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
           <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
@@ -91,6 +89,7 @@
       </v-col>
     </v-row>
 
+    <!-- //^ Top Genres List -->
     <v-row>
       <v-col>
         <h2 :align="align" class="display-1 mb-7">{{display_name}}'s Top Genres from
@@ -144,7 +143,7 @@ import _TopGenres from './_TopGenres.vue';
     computed: {
       topGenre() {
       let topGenres = {};
-        for (let genre of this.listening_data.artists[2].genres) {
+      for (let genre of this.listening_data.artists[2].genres) {
           if (topGenres[genre]) {
             topGenres[genre]++;
           } else {
@@ -183,15 +182,17 @@ import _TopGenres from './_TopGenres.vue';
       helper.setState(this);
       helper.printState(this);
 
-      // //console.log(typeof this.$route.params.id);
+      // ^ If the user is already logged in then push them to their dashboard
       this.$store.state.sharedUser = { id : this.$route.params.id };
       if (this.$store.state.loggedIn) {
         this.$router.push('/dashboard');
       }
     },
     created() {
+
+      // ^ Get the shared user's information from db
       api.getUser(this.$store.state.sharedUser.id, this).then(res=> {
-        // //console.log(res);
+
         this.display_name = res.body.profile.display_name;
         this.user_id = res.body.profile.id;
         this.profile_image = res.body.profile.images[0].url;
@@ -206,13 +207,14 @@ import _TopGenres from './_TopGenres.vue';
           
           })
         }
-        //console.log(this.listening_data);
       }).catch(e=> {
         if (e && e.status === 401) {
+          // TODO: Display error message to user 
           this.errMsg = "You do not have permission to view this data";
           this.error = true;
         } 
         else if (e && e.status === 404) {
+          // TODO: Display error message to user
           this.errMsg = "That user does not exist";
           this.error = true;
         }

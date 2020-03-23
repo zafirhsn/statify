@@ -45,16 +45,32 @@ export default {
   async saveUser(data, comp) {
     return comp.$http.post(`${process.env.VUE_APP_BACKEND_URL}/storeuser`, data);
   },
-  async getCurrentUser(id, comp) {
-    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/me/${id}`);
+  async getCurrentUser(token, comp) {
+    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/me`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
   },
   async getUser(id, comp) {
     return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/getuser/${id}`);
   },
-  async setShare(data, comp) {
-    return comp.$http.post(`${process.env.VUE_APP_BACKEND_URL}/setshare`, data);
+  async setShare(data, token, comp) {
+    return comp.$http.post(`${process.env.VUE_APP_BACKEND_URL}/setshare`, data, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
   },
-  async getShare(id, comp) {
-    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/getshare/${id}`);
+  async getShare(token, comp) {
+    return comp.$http.get(`${process.env.VUE_APP_BACKEND_URL}/getshare`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+  },
+  async getToken(payload, comp) {
+    let res = await comp.$http.post(`${process.env.VUE_APP_BACKEND_URL}/token`, payload);
+    return res.body;
   }
 }
