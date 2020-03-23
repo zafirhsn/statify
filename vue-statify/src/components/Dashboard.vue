@@ -423,35 +423,41 @@ export default {
     },
     artistSimilarities() {
       let artistSim = {};
-      for (let artist of this.listening_data.artists[this.artistTimeFrame].items) {
-        if (!artistSim[artist.id]) {
-          artistSim[artist.id] = 1;
-        } else {
-          artistSim[artist.id]++;
+      if (this.sharedUser.data) {
+        for (let artist of this.listening_data.artists[this.artistTimeFrame].items) {
+          if (!artistSim[artist.id]) {
+            artistSim[artist.id] = 1;
+          } else {
+            artistSim[artist.id]++;
+          }
         }
-      }
-      for (let artist of this.sharedUser.data.artists[this.artistTimeFrame].items) {
-        if (artistSim[artist.id]) {
-          artistSim[artist.id]++;
-        }
+
+          for (let artist of this.sharedUser.data.artists[this.artistTimeFrame].items) {
+            if (artistSim[artist.id]) {
+              artistSim[artist.id]++;
+            }
+          }
       }
       return artistSim;
     },
     trackSimilarities() {
       let trackSim = {};
-      let filteredUserTracks = this.listening_data.tracks[this.trackTimeFrame].items.slice(0,10);
-      let filteredSharedUserTracks = this.sharedUser.data.tracks[this.trackTimeFrame].items.slice(0,10);
+      if (this.sharedUser.data) {
+        let filteredUserTracks = this.listening_data.tracks[this.trackTimeFrame].items.slice(0,10);
+        
+        let filteredSharedUserTracks = this.sharedUser.data.tracks[this.trackTimeFrame].items.slice(0,10);
 
-      for (let track of filteredUserTracks) {
-        if (!trackSim[track.id]) {
-          trackSim[track.id] = 1;
-        } else {
-          trackSim[track.id]++;
+        for (let track of filteredUserTracks) {
+          if (!trackSim[track.id]) {
+            trackSim[track.id] = 1;
+          } else {
+            trackSim[track.id]++;
+          }
         }
-      }
-      for (let track of filteredSharedUserTracks) {
-        if (trackSim[track.id]) {
-          trackSim[track.id]++;
+        for (let track of filteredSharedUserTracks) {
+          if (trackSim[track.id]) {
+            trackSim[track.id]++;
+          }
         }
       }
       return trackSim;
@@ -459,54 +465,56 @@ export default {
     genreSimilarities() {
       let genreSim = {};
 
-      let topUserGenres = {};
-      let topUserGenresArr = [];
-      for (let genre of this.listening_data.artists[Number(this.genreTimeFrame)].genres) {
-        if (topUserGenres[genre]) {
-          topUserGenres[genre]++;
-        } else {
-          topUserGenres[genre] = 1;
+      if (this.sharedUser.data) {
+        let topUserGenres = {};
+        let topUserGenresArr = [];
+        for (let genre of this.listening_data.artists[Number(this.genreTimeFrame)].genres) {
+          if (topUserGenres[genre]) {
+            topUserGenres[genre]++;
+          } else {
+            topUserGenres[genre] = 1;
+          }
         }
-      }
-      for (let genre in topUserGenres) {
-        let capitalizedGenre = this.capitalizeGenre(genre);
-        topUserGenresArr.push([capitalizedGenre, topUserGenres[genre]]);
-      }
-      topUserGenresArr.sort((a, b)=> {
-        return b[1] - a[1];
-      })
-      topUserGenresArr = topUserGenresArr.slice(0, 10);
-
-      let topSharedUserGenres = {};
-      let topSharedUserGenresArr = []
-
-      for (let genre of this.sharedUser.data.artists[Number(this.genreTimeFrame)].genres) {
-        if (topSharedUserGenres[genre]) {
-          topSharedUserGenres[genre]++;
-        } else {
-          topSharedUserGenres[genre] = 1;
+        for (let genre in topUserGenres) {
+          let capitalizedGenre = this.capitalizeGenre(genre);
+          topUserGenresArr.push([capitalizedGenre, topUserGenres[genre]]);
         }
-      }
-      for (let genre in topSharedUserGenres) {
-        let capitalizedGenre = this.capitalizeGenre(genre);
-        topSharedUserGenresArr.push([capitalizedGenre, topSharedUserGenres[genre]]);
-      }
-      topSharedUserGenresArr.sort((a, b)=> {
-        return b[1] - a[1];
-      })
-      topSharedUserGenresArr = topSharedUserGenresArr.slice(0, 10);
+        topUserGenresArr.sort((a, b)=> {
+          return b[1] - a[1];
+        })
+        topUserGenresArr = topUserGenresArr.slice(0, 10);
 
-      for (let genre of topUserGenresArr) {
-        if (!genreSim[genre[0]]) {
-          genreSim[genre[0]] = 1;
-        } else {
-          genreSim[genre[0]]++;
+        let topSharedUserGenres = {};
+        let topSharedUserGenresArr = []
+
+        for (let genre of this.sharedUser.data.artists[Number(this.genreTimeFrame)].genres) {
+          if (topSharedUserGenres[genre]) {
+            topSharedUserGenres[genre]++;
+          } else {
+            topSharedUserGenres[genre] = 1;
+          }
         }
-      }
+        for (let genre in topSharedUserGenres) {
+          let capitalizedGenre = this.capitalizeGenre(genre);
+          topSharedUserGenresArr.push([capitalizedGenre, topSharedUserGenres[genre]]);
+        }
+        topSharedUserGenresArr.sort((a, b)=> {
+          return b[1] - a[1];
+        })
+        topSharedUserGenresArr = topSharedUserGenresArr.slice(0, 10);
 
-      for (let genre of topSharedUserGenresArr) {
-        if (genreSim[genre[0]]) {
-          genreSim[genre[0]]++;
+        for (let genre of topUserGenresArr) {
+          if (!genreSim[genre[0]]) {
+            genreSim[genre[0]] = 1;
+          } else {
+            genreSim[genre[0]]++;
+          }
+        }
+
+        for (let genre of topSharedUserGenresArr) {
+          if (genreSim[genre[0]]) {
+            genreSim[genre[0]]++;
+          }
         }
       }
       return genreSim;
