@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row class="ma-5">
       <v-col align="center">
-        <!-- TODO: Pick a better name -->
+        <!-- // TODO: Pick a better name -->
         <h1 class="display-4 font-weight-thin">Statify</h1>
         <p class="subtitle-1">Your music in numbers</p>
       </v-col>
@@ -69,14 +69,14 @@ import helper from '../services/helper'
       //console.log("Logged In: ", this.$store.state.loggedIn);
       //console.log("Token Expired: ", this.$store.state.tokenExpired);
 
-      if (!this.$store.state.loggedIn && localStorage.getItem("token")) {
-        //console.log("The user is not logged in but an old token remains in localStorage: ", JSON.parse(localStorage.getItem("token")));
-        localStorage.removeItem("token");
+      if (!this.$store.state.loggedIn && localStorage.getItem("user")) {
+        //console.log("The user is not logged in but an old token remains in localStorage: ", JSON.parse(localStorage.getItem("user")));
+        localStorage.removeItem("user");
         sessionStorage.removeItem("data");
         this.$store.state.dataCached = false;
       }
       else if (this.$store.state.loggedIn) {
-        //console.log("The user is logged in: ", JSON.parse(localStorage.getItem("token")));
+        //console.log("The user is logged in: ", JSON.parse(localStorage.getItem("user")));
         this.$router.push("/dashboard");
       }
     },

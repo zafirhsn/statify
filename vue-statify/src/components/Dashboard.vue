@@ -1,15 +1,15 @@
 <template>
-  <v-container>
+    <v-container>
 
-    <!-- ^ APP BAR NAV -->
+    <!-- // ^ APP BAR NAV-->
     <v-app-bar fixed elevate-on-scroll height="80" color="white">
       <v-spacer></v-spacer>
 
-      <!-- ^ MENU -->
+      <!-- // ^ MENU -->
       <v-menu :close-on-content-click=vuetify.closeOnContentClick offset-y transition="slide-y-transition">
-        <!-- TODO: Make menu open lower under avatar (offset-y is not enough). Vuetify is adding the position of the menu using an inline style tag. !important is not working as a internal class or inline style-->
+        <!-- // TODO: Make menu open lower under avatar (offset-y is not enough). Vuetify is adding the position of the menu using an inline style tag. !important is not working as a internal class or inline style-->
 
-        <!-- Avatar is activator for menu -->
+        <!-- // Avatar is activator for menu -->
         <template v-slot:activator="{on}">
             <v-btn fab v-on="on">
               <v-avatar size="52">
@@ -17,12 +17,12 @@
               </v-avatar>
             </v-btn>
         </template>
+ 
 
-
-        <!-- Menu is a card made up of lists -->
+        <!-- // Menu is a card made up of lists -->
         <v-card>
 
-          <!-- First list is avatar with display name and sharing status -->
+          <!-- // First list is avatar with display name and sharing status -->
           <v-list>
             <v-list-item>
               <v-list-item-avatar>
@@ -41,12 +41,12 @@
 
           <v-divider></v-divider>
 
-          <!-- Second list is sharing switch and logout button-->
+          <!-- // Second list is sharing switch and logout button-->
           <v-list>
             <v-list-item>
               <v-list-item-action>
                 <v-switch inset v-model="sharing" color="#1DB954" label=" Sharing" id="menuShareSwitch">
-                  <!-- TODO: Sharing label is too close to the switch -->
+                  <!-- // TODO: Sharing label is too close to the switch -->
                 </v-switch>
               </v-list-item-action>
             </v-list-item>
@@ -66,7 +66,7 @@
       
     </v-app-bar>
 
-    <!-- ^ PROFILE PIC-->
+    <!-- // ^ PROFILE PIC-->
     <v-row class="mt-12">
       <v-col class="mt-12" align="center">
 
@@ -82,7 +82,7 @@
       </v-col>
     </v-row>
 
-    <!-- ^ DISPLAY NAME -->
+    <!-- // ^ DISPLAY NAME -->
     <v-row>
       <v-col align="center">
         <span class="display-3 font-weight-thin">{{display_name}}</span>
@@ -93,19 +93,19 @@
       </v-col>
     </v-row>
 
-    <!-- ^ SHARE-LINK COMPONENT -->
+    <!-- // ^ SHARE-LINK COMPONENT -->
     <share-link :shareable_link="shareable_link" :sharing="sharing" :compareData="compareData" :sharedUserExists="sharedUserExists" @updateCompare="compareData = $event" @updateSharing="sharing = $event"></share-link>
 
-    <!-- <v-divider class="mb-3"></v-divider> -->
+    <!-- // <v-divider class="mb-3"></v-divider> -->
 
-    <!-- ! FEATURE TO GENERATE SHARED PLAYLIST -->
+    <!-- // ! FEATURE TO GENERATE SHARED PLAYLIST -->
     <v-row v-if="compareData">
       <v-col>
-        <!-- TODO: Conditionally render generate playlist button --> 
+        <!-- // TODO: Conditionally render generate playlist button --> 
       </v-col>
     </v-row>
 
-    <!-- ^ AT A GLANCE -->
+    <!-- // ^ AT A GLANCE -->
     <v-row>
 
       <v-col align="center">
@@ -117,11 +117,11 @@
         </v-row>
 
         <v-row>
-          <!-- TODO: Do NOT hardcode this, use a computed property -->
+          <!-- // TODO: Do NOT hardcode this, use a computed property -->
           <top-item :images="listening_data.artists[2].items[0].images" type="artist" :name="listening_data.artists[2].items[0].name"
           ></top-item>
           <top-item :images="listening_data.tracks[2].items[0].images" type="track" :name="listening_data.tracks[2].items[0].name"></top-item>
-          <top-item type="genre" :name="topGenre"></top-item>
+          <top-item type="genre" :name="topUserGenre"></top-item>
         </v-row>
 
       </v-col>
@@ -136,11 +136,11 @@
         </v-row>
 
         <v-row>
-          <!-- TODO: Do NOT hardcode this, use a computed property -->
+          <!-- // TODO: Do NOT hardcode this, use a computed property -->
           <top-item :images="sharedUser.data.artists[2].items[0].images" type="artist" :name="sharedUser.data.artists[2].items[0].name"
           ></top-item>
           <top-item :images="sharedUser.data.tracks[2].items[0].images" type="track" :name="sharedUser.data.tracks[2].items[0].name"></top-item>
-          <top-item type="genre" :name="topGenre"></top-item>
+          <top-item type="genre" :name="topSharedUserGenre"></top-item>
         </v-row>
 
       </v-col>
@@ -150,38 +150,29 @@
 
     <v-divider class="mb-3"></v-divider>
 
-    <!-- ^ TOP-LISTS COMPONENT (ARTISTS) -->
+    <!-- // ^ TOP-LISTS COMPONENT (ARTISTS) -->
     <v-row>
 
       <v-col>
 
-        <!-- List headline  -->
+        <!-- // List headline  -->
         <h2 :align="align" class="display-1 mb-7">Your Top Artists From              
           <span v-if="Number(artistTimeFrame)===0">the Last Month</span>
           <span v-if="Number(artistTimeFrame)===1">the Last 6 Months</span>
           <span v-if="Number(artistTimeFrame)===2">All Time</span>
         </h2>
 
-        <!-- List Radio Group for time frame -->
+        <!-- // List Radio Group for time frame -->
         <v-radio-group v-model="artistTimeFrame" row mandatory>
-          
-          <!-- TODO: Change hover color to be spotify green -->
           <v-radio label="Last Month" value="0" color="#1DB954"></v-radio>
           <v-radio label="Last 6 Months" value="1" color="#1DB954"></v-radio>
           <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
         </v-radio-group>
 
-        <!-- List -->
-        <top-lists :data="listening_data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame">
+        <!-- // List -->
+        <top-lists :data="listening_data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame" :similarities="artistSimilarities">
         </top-lists>
-
-        <v-row v-if="!listening_data">
-          <v-col v-for="(index) in 10" :key="index">
-            <v-skeleton-loader tile type="v-list-item-avatar"></v-skeleton-loader>
-          </v-col>
-        </v-row>
   
-
       </v-col>
 
 
@@ -197,7 +188,7 @@
           <span v-if="Number(artistTimeFrame)===2">All Time</span>
         </h2>
 
-        <top-lists :data="sharedUser.data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame">
+        <top-lists :data="sharedUser.data" :compareData="compareData" listType="artists" :timeFrame="artistTimeFrame" :similarities="artistSimilarities">
         </top-lists>
 
 
@@ -205,10 +196,14 @@
 
     </v-row>
 
+    <!-- //^ DIFFERENCES BETWEEN ARTIST DATA  -->
+    <v-row v-if="compareData">
+      <differences :sharedUser="sharedUser" :user="listening_data" :timeFrame="artistTimeFrame" type="artists"></differences>
+    </v-row>
 
     <v-divider class="mb-3"></v-divider>
 
-    <!-- ^ TOP-LISTS COMPONENT (TRACKS) -->
+    <!-- // ^ TOP-LISTS COMPONENT (TRACKS) -->
     <v-row>
 
       <v-col>
@@ -225,7 +220,7 @@
           <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
         </v-radio-group>
 
-        <top-lists :data="listening_data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame">
+        <top-lists :data="listening_data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame" :similarities="trackSimilarities">
         </top-lists>
 
       </v-col>
@@ -240,18 +235,22 @@
           <span v-if="Number(trackTimeFrame)===2">All Time</span>
         </h2>
 
-        <!-- TODO: Change hardcode of sharedUser so timeFrame can work. Add two more pieces of data to the sharedUser data object -->
-        <top-lists :data="sharedUser.data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame">
+        <top-lists :data="sharedUser.data" :compareData="compareData" listType="tracks" :timeFrame="trackTimeFrame" :similarities="trackSimilarities">
         </top-lists>
 
       </v-col>
 
     </v-row>
 
+    <!-- //^ DIFFERENCES BETWEEN TRACK DATA -->
+    <v-row v-if="compareData">
+      <differences :sharedUser="sharedUser" :user="listening_data" :timeFrame="trackTimeFrame" type="tracks"></differences>
+    </v-row>
+
 
     <v-divider class="mb-3"></v-divider>
 
-    <!-- ^ TOP GENRE -->
+    <!-- // ^ TOP GENRE -->
     <v-row>
       <v-col>
         <h2 :align="align" class="display-1 mb-7">Your Top Genres from
@@ -266,14 +265,14 @@
           <v-radio label="All Time" value="2" color="#1DB954"></v-radio>
         </v-radio-group>
         
-        <top-genres :data="listening_data.artists" :compareData="compareData" listType="genres" :timeFrame=genreTimeFrame>
+        <top-genres :data="listening_data.artists" :compareData="compareData" listType="genres" :timeFrame="genreTimeFrame" :similarities="genreSimilarities">
 
         </top-genres>
       </v-col>
 
       <v-divider vertical v-if="compareData"></v-divider>
 
-      <!-- TODO: conditionally render shared user word cloud -->
+      <!-- // TODO: conditionally render shared user word cloud -->
       <v-col v-if="compareData">
         <h2 :align="align" class="display-1 mb-7">{{sharedUser.profile.display_name}}'s Top Genres from
           <span v-if="Number(genreTimeFrame)===0">the Last Month</span>
@@ -281,22 +280,27 @@
           <span v-if="Number(genreTimeFrame)===2">All Time</span>
         </h2>
 
-        <top-genres :data="sharedUser.data.artists" :compareData="compareData" listType="genres" :timeFrame=genreTimeFrame></top-genres>
+        <top-genres :data="sharedUser.data.artists" :compareData="compareData" listType="genres" :timeFrame="genreTimeFrame" :similarities="genreSimilarities"></top-genres>
       </v-col>
 
     </v-row>
 
-    <!-- ! POPULARITY / AUDIO FEATURES CHART -->
+    <!-- //^ DIFFERENCES IN TOP GENRES -->
+    <v-row v-if="compareData">
+      <differences :sharedUser="sharedUser" :user="listening_data" :timeFrame="genreTimeFrame" type="genres"></differences>
+    </v-row>
+
+    <!-- // ! POPULARITY / AUDIO FEATURES CHART -->
     <v-row>
       <v-col>
-        <!-- TODO: Render popularity chart of artists -->
+        <!-- // TODO: Render popularity chart of artists -->
       </v-col>
       <v-col>
-        <!-- TODO: conditionally render sharedUser chart -->
+        <!-- // TODO: conditionally render sharedUser chart -->
       </v-col>
     </v-row>
 
-    <!-- ^ SHARE-LINK COMPONENT -->
+    <!-- // ^ SHARE-LINK COMPONENT -->
     <share-link :shareable_link="shareable_link" :sharing="sharing" @updateSharing="sharing = $event"></share-link>
 
   </v-container>
@@ -312,6 +316,7 @@ import _TopItem from './_TopItem.vue';
 import _ShareLink from './_ShareLink.vue';
 import _TopLists from './_TopLists.vue';
 import _TopGenres from './_TopGenres.vue';
+import Differences from './Differences.vue'
 
 export default {
   data() {
@@ -341,15 +346,28 @@ export default {
     'top-item': _TopItem,
     'share-link': _ShareLink,
     'top-lists': _TopLists,
-    'top-genres': _TopGenres
+    'top-genres': _TopGenres,
+    'differences': Differences
   },
   watch: {
     sharing() {
       // console.log(this.sharing);
-      api.setShare({ id: this.user_id, share: this.sharing}, this).then((res)=> {
+      api.setShare({ id: this.user_id, share: this.sharing}, localStorage.getItem("apitoken"), this).then((res)=> {
         return res
       }).catch(e=> {
-        return e;
+        if (e.status === 401) {
+          api.getToken({id: this.user_id, display_name: this.display_name}, this).then((token)=> {
+            localStorage.setItem("apitoken", token);
+
+            api.setShare({ id: this.user_id, share: this.sharing}, localStorage.getItem("apitoken"), this).then(()=> {}).catch((err)=>{return err;})
+
+            }).catch(err=> {
+              return err;
+              // TODO: Deal with 403 and 500 error here
+            })
+        } else {
+        // TODO: Deal with non 401 errors from setting share permissions
+        }
       })
     },
     radioGroup() {
@@ -363,7 +381,7 @@ export default {
         }
         return "start"
     },
-    topGenre() {
+    topUserGenre() {
       let topGenres = {};
       // HARDCODE
       for (let genre of this.listening_data.artists[2].genres) {
@@ -382,13 +400,132 @@ export default {
         }
       }
       return maxKey;
+    },
+    topSharedUserGenre() {
+      let topGenres = {};
+      // HARDCODE
+      for (let genre of this.sharedUser.data.artists[2].genres) {
+        if (topGenres[genre]) {
+          topGenres[genre]++;
+        } else {
+          topGenres[genre] = 1;
+        }
+      }
+      let max = 0; 
+      let maxKey = "";
+      for (let key in topGenres) {
+        if (topGenres[key] > max) {
+          max = topGenres[key];
+          maxKey = key;
+        }
+      }
+      return maxKey;
+    },
+    artistSimilarities() {
+      let artistSim = {};
+      for (let artist of this.listening_data.artists[this.artistTimeFrame].items) {
+        if (!artistSim[artist.id]) {
+          artistSim[artist.id] = 1;
+        } else {
+          artistSim[artist.id]++;
+        }
+      }
+      for (let artist of this.sharedUser.data.artists[this.artistTimeFrame].items) {
+        if (artistSim[artist.id]) {
+          artistSim[artist.id]++;
+        }
+      }
+      return artistSim;
+    },
+    trackSimilarities() {
+      let trackSim = {};
+      let filteredUserTracks = this.listening_data.tracks[this.trackTimeFrame].items.slice(0,10);
+      let filteredSharedUserTracks = this.sharedUser.data.tracks[this.trackTimeFrame].items.slice(0,10);
+
+      for (let track of filteredUserTracks) {
+        if (!trackSim[track.id]) {
+          trackSim[track.id] = 1;
+        } else {
+          trackSim[track.id]++;
+        }
+      }
+      for (let track of filteredSharedUserTracks) {
+        if (trackSim[track.id]) {
+          trackSim[track.id]++;
+        }
+      }
+      return trackSim;
+    },
+    genreSimilarities() {
+      let genreSim = {};
+
+      let topUserGenres = {};
+      let topUserGenresArr = [];
+      for (let genre of this.listening_data.artists[Number(this.genreTimeFrame)].genres) {
+        if (topUserGenres[genre]) {
+          topUserGenres[genre]++;
+        } else {
+          topUserGenres[genre] = 1;
+        }
+      }
+      for (let genre in topUserGenres) {
+        let capitalizedGenre = this.capitalizeGenre(genre);
+        topUserGenresArr.push([capitalizedGenre, topUserGenres[genre]]);
+      }
+      topUserGenresArr.sort((a, b)=> {
+        return b[1] - a[1];
+      })
+      topUserGenresArr = topUserGenresArr.slice(0, 10);
+
+      let topSharedUserGenres = {};
+      let topSharedUserGenresArr = []
+
+      for (let genre of this.sharedUser.data.artists[Number(this.genreTimeFrame)].genres) {
+        if (topSharedUserGenres[genre]) {
+          topSharedUserGenres[genre]++;
+        } else {
+          topSharedUserGenres[genre] = 1;
+        }
+      }
+      for (let genre in topSharedUserGenres) {
+        let capitalizedGenre = this.capitalizeGenre(genre);
+        topSharedUserGenresArr.push([capitalizedGenre, topSharedUserGenres[genre]]);
+      }
+      topSharedUserGenresArr.sort((a, b)=> {
+        return b[1] - a[1];
+      })
+      topSharedUserGenresArr = topSharedUserGenresArr.slice(0, 10);
+
+      for (let genre of topUserGenresArr) {
+        if (!genreSim[genre[0]]) {
+          genreSim[genre[0]] = 1;
+        } else {
+          genreSim[genre[0]]++;
+        }
+      }
+
+      for (let genre of topSharedUserGenresArr) {
+        if (genreSim[genre[0]]) {
+          genreSim[genre[0]]++;
+        }
+      }
+      return genreSim;
     }
   },
   methods: {
+    capitalizeGenre(genre) {
+      let garr = genre.split(" ");
+      let garr2 = [];
+      for (let part of garr) {
+        garr2.push(part[0].toUpperCase() + part.substring(1, part.length))
+      }
+      return garr2.join(" ");
+    },
     logout() {
       sessionStorage.removeItem("data");
       sessionStorage.removeItem("sharedUser");
-      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("apitoken");
       helper.setState(this);
       this.$router.push('/');
     }
@@ -406,29 +543,30 @@ export default {
   created() {
     const updateState = async () => {
       if (!this.$store.state.loggedIn) {
-        //console.log("Not logged in: ", localStorage.getItem("token"));
 
         if (helper.validHashParams()) {
           //console.log("Valid hash in URL");
 
-          // Get the params from the url and store them in an object. Add a timestamp to the object and create the string access token as well
+          // ^ Get the params from the url and store them in an object. Add a timestamp to the object and create the string access token as well
           let hashObj = helper.getHashParams();
           let time = Math.floor(new Date().getTime() / 1000);
           hashObj["time"] = time;
-          let access_token = JSON.stringify(hashObj.access_token);
-          access_token = access_token.slice(1, access_token.length - 1);
+          let spotifyToken = JSON.stringify(hashObj.access_token);
+          spotifyToken = spotifyToken.slice(1, spotifyToken.length - 1);
 
-          // Get profile data and listening data
+          // ^ Get profile data and listening data
           let listeningData;
           let profileData;
 
+          // ^ Request current user's profile and data from Spotify
           try {
-            listeningData = await api.getUserListeningData(access_token, this);
-            profileData = await api.getCurrentUserProfile(access_token, this);
+            listeningData = await api.getUserListeningData(spotifyToken, this);
+            profileData = await api.getCurrentUserProfile(spotifyToken, this);
           } catch (e) {
             if (e & e.status === 401) {
-              localStorage.removeItem("token");
+              localStorage.removeItem("user");
               sessionStorage.removeItem("data");
+              localStorage.removeItem("apitoken");
               helper.setState(this);
               this.$router.push('/');
             } else {
@@ -436,9 +574,12 @@ export default {
               //console.log(e);
             }
           }
-          // Add id and display_name to hasObj that will be stored in localStorage
+
+          // ^ Add id and display_name to hasObj that will be stored in localStorage
           hashObj["id"] = profileData.id;
           hashObj["display_name"] = profileData.display_name;
+          
+          // ^ Check if user has a profile picture, otherwise, use a default profile from Lorem Picsum
           if (profileData.images.length) {
             hashObj["profile_image"] = profileData.images[0].url;
           } else {
@@ -453,9 +594,9 @@ export default {
               tracks: [],
             }
           }
-          // Compress 
+          // ^ Filter and Compress data from Spotify to be saved in DB
           listeningData.forEach((item, index)=> {
-            // HARDCODE
+            //! HARDCODE
             if (index < 3) {
               filteredListeningData.data.artists.push(helper.compressData(helper.cleanArtistData(item)));
             } else {
@@ -463,38 +604,68 @@ export default {
             }
           })
           //console.log("THIS IS THE LISTENING DATA", listeningData);
-            
-          
+        
+          //! GET JWT TOKEN FROM BACKEND HERE 
+          try {
+            let token = await api.getToken({id: profileData.id, display_name: 
+            profileData.display_name}, this);
+            localStorage.setItem("apitoken", token);
+          } catch(e) {
+            // TODO: Give an error message here, maybe "application is not available right now"
+            console.log(e);
+          }
 
-          // Save the data in the db
+          // ^ Save the filtered and compressed data in the db
           try { 
             await api.saveUser(filteredListeningData, this);
             //console.log("Successfully stored user's profile in database")
           } catch(e) {
+            // TODO: If error saving to db, push user back to login, or, again give application not available message
             //console.log("There was an error saving the user to the db");
-            localStorage.removeItem("token");
+            localStorage.removeItem("user");
             sessionStorage.removeItem("data");
+            localStorage.removeItem("apitoken");
             helper.setState(this);
             this.$router.push('/');
           }
 
-          // Cache the data in sessionStorage
+          // ^ Cache the data in sessionStorage
           sessionStorage.setItem("data", JSON.stringify(filteredListeningData.data));
           helper.setState(this);
           //console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")))
 
-          // Cache the token with profile info in localStorage
-          localStorage.setItem("token", JSON.stringify(hashObj));
+          // ^ Cache the token with profile info in localStorage
+          localStorage.setItem("user", JSON.stringify(hashObj));
           helper.setState(this);
-          //console.log("Logged in: ", JSON.parse(localStorage.getItem("token")));
+          //console.log("Logged in: ", JSON.parse(localStorage.getItem("user")));
           //console.log(this.$store.state.loggedIn);
 
-          // Set up Vue data vars 
+          // ^ Set up Vue data vars 
           this.display_name =  profileData.display_name;
           this.user_id =  profileData.id;
           this.shareable_link = `${process.env.VUE_APP_FRONTEND_URL}/user/${this.user_id}`;
-          let sharing = await api.getShare(this.user_id, this);
-          this.sharing = sharing.body;
+
+
+          let token = localStorage.getItem("apitoken");
+          let sharing; 
+          try {
+            sharing = await api.getShare(token, this);
+            this.sharing = sharing.body;
+          } catch(e) {
+            if (e.status === 401) {
+              try {
+                let token = await api.getToken({id: this.user_id, display_name: this.display_name}, this);
+                localStorage.setItem("apitoken", token);
+
+                sharing = await api.getShare(token, this);
+                this.sharing = sharing.body;
+
+              } catch (e) {
+                // TODO: Deal with error involving getting token, maybe "application error message"
+              }
+            }
+          }
+
           if (profileData.images.length) {
             this.profile_image = profileData.images[0].url;
           } else {
@@ -511,14 +682,33 @@ export default {
           })
         }
         else {
-          localStorage.removeItem("token");
+          // ^ If the user isn't logged in and there's no valid hash in url, push them out
+          localStorage.removeItem("user");
+          localStorage.removeItem("apitoken");
           sessionStorage.removeItem("data");
           helper.setState(this);
           this.$router.push("/");
         }
       }
       if (this.$store.state.loggedIn) {
-        //console.log("Already Logged In: ", JSON.parse(localStorage.getItem("token")));
+
+
+        //! CHECK IF CURRENT TOKEN IS EXPIRED, IF SO, REFRESH
+        let payload = localStorage.getItem("apitoken").split(".")
+        payload = atob(payload[1]);
+        let timenow = Math.floor(new Date().getTime() / 1000)
+        if (Number(payload.exp) <= timenow) {
+          let token; 
+          let id = JSON.parse(localStorage.getItem("user")).id;
+          let display_name = JSON.parse(localStorage.getItem("user")).display_name;
+          try {
+            token = await api.getToken({id, display_name}, this);
+            localStorage.setItem("apitoken", token);
+          } catch(e) {
+            // TODO: Decide what to do with a JWT error
+            console.log(e);
+          }
+        }
         
         if (Object.keys(this.$store.state.sharedUser).length || sessionStorage.getItem("sharedUser")) {
 
@@ -530,11 +720,13 @@ export default {
             sharedUserId = sessionStorage.getItem("sharedUser");
           }
 
-          if (sharedUserId === JSON.parse(localStorage.getItem("token")).id) {
+          if (sharedUserId === JSON.parse(localStorage.getItem("user")).id) {
+            // TODO: Empty conditional
             //console.log("this is you man");
           } else {
             //console.log("This is a diff user")
             this.sharedUserExists = true;
+
             try { 
               let user = await api.getUser(sharedUserId, this);
 
@@ -552,15 +744,17 @@ export default {
                 })
               }
               this.sharedUser = this.$store.state.sharedUser;
-              //console.log("sharedUser", this.sharedUser);
+              // console.log("sharedUser", this.sharedUser);
               this.compareData = true;
               //console.log(this.$store.state.sharedUser);
             } catch(e) {
               if (e) {
                 if (e.status === 401) {
+                  // TODO: Create error message for user
                   //console.log("You do not have permission to view this");
                 }
                 if (e.status === 404) {
+                  // TODO: Create error message for user
                   //console.log("This user does not exist");
                 }
               }
@@ -571,23 +765,55 @@ export default {
 
         if (!this.$store.state.dataCached) {
           //console.log("Data cached: ", JSON.parse(sessionStorage.getItem("data")));
-          let id = JSON.parse(localStorage.getItem("token")).id;
-          let userData = await api.getCurrentUser(id, this);
+          let token = localStorage.getItem("apitoken");
 
+          let userData;
+          try {
+            userData = await api.getCurrentUser(token, this);
+          } catch(e) {
+            if (e.status === 401) {
+              try {
+                let token = await api.getToken({id: JSON.parse(localStorage.getItem("user")).id, display_name: JSON.parse(localStorage.getItem("user")).display_name }, this);
+                localStorage.setItem("apitoken", token);
+
+                userData = await api.getCurrentUser(token, this);
+              } catch (e) {
+                // TODO: Deal with error involving getting token, maybe "application error message"
+              }
+            }
+          }
           sessionStorage.setItem("data", JSON.stringify(userData.body.data));
           helper.setState(this);
           //console.log("Data wasn't cached, but we got it from db");
         }
 
-        let profile = JSON.parse(localStorage.getItem("token"));
+        let profile = JSON.parse(localStorage.getItem("user"));
         this.display_name = profile.display_name;
         this.user_id = profile.id;
         this.profile_image = profile.profile_image;
         this.shareable_link = `${process.env.VUE_APP_FRONTEND_URL}/user/${this.user_id}`
         let dataArr = JSON.parse(sessionStorage.getItem("data"));
-        let sharing = await api.getShare(this.user_id, this);
-        this.sharing = sharing.body;
-        // console.log(this.sharing.body);
+
+        let token = localStorage.getItem("apitoken");
+        let sharing; 
+        try {
+          sharing = await api.getShare(token, this);
+          this.sharing = sharing.body;
+        } catch(e) {
+          if (e.status === 401) {
+            try {
+              let token = await api.getToken({id: this.user_id, display_name: this.display_name}, this);
+              localStorage.setItem("apitoken", token);
+
+              sharing = await api.getShare(token, this);
+              this.sharing = sharing.body;
+            } catch (e) {
+              // TODO: Deal with error involving getting token, maybe "application error message"
+            }
+          }
+        }
+
+        // ^Decompress data from sessionStorage and place it in variable
         for (let key in dataArr) {
           dataArr[key].forEach((item)=> {
             if (key === "artists") {
@@ -605,12 +831,9 @@ export default {
     updateState().then(()=> {
       this.dataArrived = true;
     }).catch(e=> {
-      
+      // TODO: Simulate long loads using dataArrived in order to test skeleton loaders
       console.log(e);
     });
-  },
-  mounted() {
-
   }
 }
 </script>

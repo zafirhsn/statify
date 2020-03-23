@@ -58,10 +58,10 @@ export default {
   },
   setState(comp) {
     let tokenObj = {};
-    if (localStorage.getItem("token")) {
-      tokenObj = JSON.parse(localStorage.getItem("token"));
+    if (localStorage.getItem("user")) {
+      tokenObj = JSON.parse(localStorage.getItem("user"));
     }
-    if (!localStorage.getItem("token") || !this.tokenLessThanOneDay(tokenObj)) {
+    if (!localStorage.getItem("user") || !this.tokenLessThanOneDay(tokenObj)) {
       comp.$store.state.loggedIn = false;
     } else {
       comp.$store.state.loggedIn = true;
@@ -71,7 +71,7 @@ export default {
     } else {
       comp.$store.state.dataCached = true;
     }
-    if (localStorage.getItem("token") && !this.tokenExpired(tokenObj)) {
+    if (localStorage.getItem("user") && !this.tokenExpired(tokenObj)) {
       comp.$store.state.tokenExpired = false;
     } else {
       comp.$store.state.tokenExpired = true;

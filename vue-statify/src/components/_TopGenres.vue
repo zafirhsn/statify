@@ -11,7 +11,7 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              <span>{{index+1}}. {{item[0]}}</span>
+              <span :class="similaritiesComp[item[0]] > 1 && compareData ? 'similar' : 'not-similar'">{{index+1}}. {{item[0]}}</span>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -34,7 +34,8 @@
       data: Array,
       compareData: Boolean,
       listType: String,
-      timeFrame: Number
+      timeFrame: String,
+      similarities: Object
     },
     methods: {
       capitalizeGenre(genre) {
@@ -47,6 +48,12 @@
       }
     },
     computed: {
+      similaritiesComp() {
+        if (!this.similarities) {
+          return {};
+        }
+        return this.similarities;
+      },
       timeFrameCaught() {
         if (!this.timeFrame) {
           return 0
@@ -70,7 +77,8 @@
         topGenresArr.sort((a, b)=> {
           return b[1] - a[1];
         })
-        return topGenresArr.splice(0, 10);
+        topGenresArr = topGenresArr.slice(0, 10);
+        return topGenresArr
       },
       numColSm() {
         if (this.compareData) {
@@ -110,5 +118,13 @@
 </script>
 
 <style scoped lang="scss">
+
+  .similar {
+    color: #ec5e5e;
+  }
+
+  .not-similar {
+    color: black;
+  }
 
 </style>

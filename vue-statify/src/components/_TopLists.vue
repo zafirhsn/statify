@@ -15,8 +15,8 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              <span v-if="listType==='artists'">{{index+1}}. {{item.name}}</span>
-              <span v-if="listType==='tracks'">{{index+1}}. {{item.name}} by {{item.artists.name}}</span>
+              <span v-if="listType==='artists'" :class ="similaritiesComp[item.id] > 1 && compareData ? 'similar' : 'not-similar'"> {{index+1}}. {{item.name}}</span>
+              <span v-if="listType==='tracks'" :class ="similaritiesComp[item.id] > 1 && compareData ? 'similar' : 'not-similar'">{{index+1}}. {{item.name}} by {{item.artists.name}}</span>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -39,9 +39,16 @@
       data: Object,
       compareData: Boolean,
       listType: String,
-      timeFrame: Number
+      timeFrame: Number,
+      similarities: Object
     },
     computed: {
+      similaritiesComp() {
+        if (!this.similarities) {
+          return {};
+        }
+        return this.similarities;
+      },
       timeFrameCaught() {
         if (!this.timeFrame) {
           return 0
@@ -109,4 +116,14 @@
   .custom-avatar {
     border-radius: 4px;
   }
+
+  .similar {
+    color: #ec5e5e;
+  }
+
+  .non-similar {
+    color: black;
+  }
+
+
 </style>
