@@ -381,6 +381,7 @@ export default {
         }
         return "start"
     },
+    // TODO: There is alot of repeat code that is applying the same logic to two similar models of data. Code can be reduced using helper functions
     topUserGenre() {
       let topGenres = {};
       // HARDCODE
