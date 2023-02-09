@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import helper from '../services/helper';
+import helper from '../utils/helper';
 import api from '../services/api/api'
 import _TopItem from './_TopItem.vue';
 import _TopLists from './_TopLists.vue'

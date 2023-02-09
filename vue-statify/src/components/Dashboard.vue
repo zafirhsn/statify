@@ -1,5 +1,6 @@
 <template>
     <v-container>
+    <comp-error v-if="error" :errorMessage=errorMessage></comp-error>
 
     <!-- // ^ APP BAR NAV-->
     <v-app-bar fixed elevate-on-scroll height="80" color="white">
@@ -94,7 +95,7 @@
     </v-row>
 
     <!-- // ^ SHARE-LINK COMPONENT -->
-    <share-link :shareable_link="shareable_link" :sharing="sharing" :compareData="compareData" :sharedUserExists="sharedUserExists" @updateCompare="compareData = $event" @updateSharing="sharing = $event"></share-link>
+    <comp-share-link :shareable_link="shareable_link" :sharing="sharing" :compareData="compareData" :sharedUserExists="sharedUserExists" @updateCompare="compareData = $event" @updateSharing="sharing = $event"></comp-share-link>
 
     <!-- // <v-divider class="mb-3"></v-divider> -->
 
@@ -118,10 +119,10 @@
 
         <v-row>
           <!-- // TODO: Do NOT hardcode this, use a computed property -->
-          <top-item :images="listening_data.artists[2].items[0].images" type="artist" :name="listening_data.artists[2].items[0].name"
-          ></top-item>
-          <top-item :images="listening_data.tracks[2].items[0].images" type="track" :name="listening_data.tracks[2].items[0].name"></top-item>
-          <top-item type="genre" :name="topUserGenre"></top-item>
+          <comp-top-item :images="listening_data.artists[2].items[0].images" type="artist" :name="listening_data.artists[2].items[0].name"
+          ></comp-top-item>
+          <comp-top-item :images="listening_data.tracks[2].items[0].images" type="track" :name="listening_data.tracks[2].items[0].name"></comp-top-item>
+          <comp-top-item type="genre" :name="topUserGenre"></comp-top-item>
         </v-row>
 
       </v-col>
@@ -137,10 +138,10 @@
 
         <v-row>
           <!-- // TODO: Do NOT hardcode this, use a computed property -->
-          <top-item :images="sharedUser.data.artists[2].items[0].images" type="artist" :name="sharedUser.data.artists[2].items[0].name"
-          ></top-item>
-          <top-item :images="sharedUser.data.tracks[2].items[0].images" type="track" :name="sharedUser.data.tracks[2].items[0].name"></top-item>
-          <top-item type="genre" :name="topSharedUserGenre"></top-item>
+          <comp-top-item :images="sharedUser.data.artists[2].items[0].images" type="artist" :name="sharedUser.data.artists[2].items[0].name"
+          ></comp-top-item>
+          <comp-top-item :images="sharedUser.data.tracks[2].items[0].images" type="track" :name="sharedUser.data.tracks[2].items[0].name"></comp-top-item>
+          <comp-top-item type="genre" :name="topSharedUserGenre"></comp-top-item>
         </v-row>
 
       </v-col>
@@ -301,7 +302,7 @@
     </v-row>
 
     <!-- // ^ SHARE-LINK COMPONENT -->
-    <share-link :shareable_link="shareable_link" :sharing="sharing" @updateSharing="sharing = $event"></share-link>
+    <comp-share-link :shareable_link="shareable_link" :sharing="sharing" @updateSharing="sharing = $event"></comp-share-link>
 
   </v-container>
 </template>
@@ -309,16 +310,20 @@
 <script>
 // import querystring from 'querystring';
 import api from '../services/api/api';
-import helper from '../services/helper'
+import helper from '../utils/helper'
 // import wordcloud from '../../node_modules/wordcloud';
 // import cloud from '../../node_modules/d3-cloud';
-import _TopItem from './_TopItem.vue';
-import _ShareLink from './_ShareLink.vue';
-import _TopLists from './_TopLists.vue';
-import _TopGenres from './_TopGenres.vue';
-import Differences from './Differences.vue'
+
 
 export default {
+  components: {
+		compTopItem: () => import('../components/_TopItem'),
+		compShareLink: () => import('../components/_ShareLink'),
+		compTopLists: () => import('../components/_TopLists'),
+		compTopGenres: () => import('../components/_TopGenres'),
+    compDifferences: () => import('../components/Differences'),
+    compError: () => import('../components/Error'),
+	},
   data() {
     return {
       display_name: "",
@@ -339,15 +344,10 @@ export default {
       vuetify: {
         closeOnContentClick: false
       },
-      dataArrived: false
+      dataArrived: false,
+      error: false,
+      errorMessage: "",
     }
-  },
-  components: {
-    'top-item': _TopItem,
-    'share-link': _ShareLink,
-    'top-lists': _TopLists,
-    'top-genres': _TopGenres,
-    'differences': Differences
   },
   watch: {
     sharing() {
@@ -551,6 +551,8 @@ export default {
   },
   created() {
     const updateState = async () => {
+
+      // TODO: Replace loggedIn boolean with session cookie from backend
       if (!this.$store.state.loggedIn) {
 
         if (helper.validHashParams()) {
@@ -700,8 +702,6 @@ export default {
         }
       }
       if (this.$store.state.loggedIn) {
-
-
         //! CHECK IF CURRENT TOKEN IS EXPIRED, IF SO, REFRESH
         let payload = localStorage.getItem("apitoken").split(".")
         payload = atob(payload[1]);
