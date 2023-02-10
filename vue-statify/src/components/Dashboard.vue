@@ -581,8 +581,9 @@ export default {
               helper.setState(this);
               this.$router.push('/');
             } else {
-              // TODO: GIVE USER AN ERROR MESSAGE, APPLICATION IS NOT AVAILABLE, SOMETHING
-              //console.log(e);
+              Bugsnag.notify(e);
+              error = true;
+              errorMessage = "Sorry our app is not available at this time!"
             }
           }
 
@@ -622,8 +623,9 @@ export default {
             profileData.display_name}, this);
             localStorage.setItem("apitoken", token);
           } catch(e) {
-            // TODO: Give an error message here, maybe "application is not available right now"
-            console.log(e);
+            Bugsnag.notify(e);
+            error = true;
+            errorMessage = "Sorry our app is not available at this time!";
           }
 
           // ^ Save the filtered and compressed data in the db
